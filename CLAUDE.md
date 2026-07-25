@@ -17,6 +17,23 @@
   jamais d'appel API GitLab manuel en dehors du MCP.
 - GitHub : accès natif Claude Code (local et Cloud), pour clone/branch/commit/push.
 
+### Limitation actuelle : MCP GitLab indisponible en session cloud
+
+Les sessions Claude Code Cloud (web/app) ne chargent pas les MCP servers
+configurés (limitation Anthropic connue, pas une erreur de config de ce repo).
+En session cloud, **ne pas tenter d'appeler les tools GitLab** — ils ne seront
+pas disponibles.
+
+Règle de contournement : en session cloud, l'utilisateur colle le contexte de
+l'issue GitLab directement dans le prompt (numéro, titre, description). Claude
+travaille sur cette base sans accès GitLab autonome. La mise à jour de l'issue
+(commentaire, fermeture, avancement de l'epic) se fait ensuite en session
+locale, une fois le MCP GitLab de nouveau disponible.
+
+À revérifier périodiquement : si Anthropic corrige cette limitation, retirer
+cette section et repasser au flux normal (issue lue et mise à jour directement
+en session cloud via MCP).
+
 ## Convention de nommage des branches
 
 - Format : `<type>/<numero-issue-gitlab>-<slug-court>`
