@@ -1,5 +1,40 @@
 # CLAUDE.md — Conventions du projet
 
+## Ce que ce dépôt est (et n'est pas)
+
+`gitlab-facade` est un **framework réutilisable** — la méthodologie et
+l'outillage (doctrine, skills, scripts) pour développer *n'importe quel*
+projet avec Claude Code en suivant de vraies pratiques d'ingénierie : cadrage
+(claude-mastery : `/cadre`, `/planifie`...), gestion de backlog façon Scrum
+sur GitLab, versioning GitLab Flow (branches + Merge Request), et exécution
+autonome par Claude Code Cloud sur ce backlog — y compris en l'absence de
+l'utilisateur, comme le ferait une équipe de développement qui pioche des
+tickets.
+
+**Ce dépôt lui-même n'héberge jamais de "vrai" projet produit.** Son propre
+développement (le framework qui s'améliore) suit néanmoins ce même GitLab
+Flow, sur son propre projet GitLab méta `ai-agent-projects/gitlab-facade` —
+c'est un cas normal d'auto-hébergement, pas une exception à la règle
+ci-dessus.
+
+### Réutiliser ce framework pour un nouveau projet
+
+Chaque nouveau projet (cahier des charges → application livrée) a sa **propre
+paire** dépôt GitHub + projet GitLab, distincte de celles de `gitlab-facade`.
+GitHub n'existe que parce que Claude Code Cloud l'impose (voir Doctrine
+ci-dessous) — GitLab reste la seule source de vérité, y compris pour ce
+nouveau projet.
+
+Processus actuel : **manuel, étape par étape, validé par l'utilisateur à
+chaque étape** (pas de skill d'amorçage automatique pour l'instant). Ce qui
+change d'un projet à l'autre, concrètement, c'est le contenu de
+`.claude/gitlab-project.env` (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`) —
+`scripts/gitlab-api.sh` et les skills (`/backlog-gitlab`, `/tache`, `/livre`)
+ne codent jamais un projet en dur, ils lisent toujours ce fichier. Le token
+GitLab, lui, n'a pas besoin de changer d'un projet à l'autre : scopé au
+groupe, il fonctionne tel quel pour tout nouveau projet créé dans ce groupe
+(voir Sécurité du token GitLab).
+
 ## Doctrine (à ne jamais enfreindre)
 
 - **GitLab est la seule source de vérité projet** : backlog, epics, issues, jalons,
@@ -7,8 +42,11 @@
 - **GitHub est une façade d'exécution technique**, imposée par Claude Code Cloud.
   Il n'a aucune autorité : pas de review qui compte, pas de merge décisionnel,
   pas de protection de branche significative. Le code y transite, rien de plus.
-- Le code sur GitHub est répliqué vers GitLab en sens unique (miroir), jamais
-  l'inverse. Ne jamais pousser manuellement sur la copie miroir côté GitLab.
+- **La review et le merge réels se font via une Merge Request GitLab**
+  (GitLab Flow) — voir Cycle de vie d'une tâche. Le `main` GitHub est
+  resynchronisé après coup depuis GitLab, jamais l'inverse : ne jamais
+  pousser manuellement un `main` GitHub qui n'a pas d'abord été mergé côté
+  GitLab.
 
 ### Vocabulaire : work items
 
@@ -63,16 +101,25 @@ erreur ("Blocked issues not available for current license"). Seul le type
 
 ### Sécurité du token GitLab
 
+Un **seul token**, `GITLAB_TOKEN`, couvre à la fois l'API backlog (work
+items/milestones) et le push de code + Merge Requests (voir Cycle de vie
+d'une tâche). Choix délibéré : minimiser le nombre de créations manuelles de
+token (Claude ne peut pas en créer lui-même), au prix d'un rayon d'action
+plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
+`feedback` associée.
+
 - Type de token : **Personal Access Token fine-grained** (GA depuis GitLab
   19.2, disponible sur tous les tiers dont Free — contrairement au Group
   Access Token, qui nécessite Premium/Ultimate sur GitLab.com et n'est donc
   pas utilisable ici). Créé depuis les réglages du compte personnel
-  (`https://gitlab.com/-/user_settings/personal_access_tokens`), mais
-  **scopé aux groupes/projets cibles** (ex. "ai agent projects") au moment
-  de la création — ce qui évite l'écueil d'un PAT classique qui hériterait
-  de tous les droits du compte sur GitLab.com.
-- Permissions confirmées nécessaires (testées en conditions réelles le
-  2026-07-26 sur le groupe "ai-agent-projects", tier Free) :
+  (`https://gitlab.com/-/user_settings/personal_access_tokens`).
+- **Scopé au groupe `ai-agent-projects`, jamais à un projet précis** — c'est
+  ce qui permet de le créer **une seule fois** et de le réutiliser tel quel
+  pour tout nouveau projet créé dans ce groupe (voir Réutiliser ce framework
+  pour un nouveau projet) : jamais besoin d'en recréer un par projet.
+- Permissions nécessaires (testées en conditions réelles le 2026-07-26 pour
+  la partie API backlog ; la partie push/MR reste à confirmer au premier
+  test réel du skill `/livre`) :
   - **Group and project permissions → Groups → `Group: Read`**
   - **Group and project permissions → Project Planning → `Work Item: Create,
     Read, Update, Delete`** — autorise la création d'issues via la mutation
@@ -80,21 +127,28 @@ erreur ("Blocked issues not available for current license"). Seul le type
   - **User permissions → `Project: Create`** — nécessaire pour créer un
     projet dans le groupe (catégorie distincte de "Group and project
     permissions", facile à manquer).
+  - **Group and project permissions → Repository → `Repository: Write`** —
+    pousser des branches. Libellé exact non encore vérifié en conditions
+    réelles.
+  - Création/merge de **Merge Requests** — permission exacte non encore
+    identifiée dans le catalogue fine-grained, à découvrir au premier test
+    (si 403 `insufficient_granular_scope`, le message indique la permission
+    manquante).
   - La création de Milestones et les liens `relates_to` ont fonctionné sans
     permission "Milestone"/"Issue Link" dédiée trouvée dans le formulaire —
     probablement couverts implicitement par l'accès projet de base.
-  - Si un appel échoue malgré tout avec une erreur 403
-    (`insufficient_granular_scope`), le message d'erreur indique la
-    permission exacte manquante : régénérer le token en l'ajoutant.
 - Expiration à définir à la création du token (recommandé : courte, ex. 90
   jours) et à suivre manuellement (pas de rotation automatique).
 - Stockage : uniquement dans `.env` local (gitignoré, jamais committé) et,
   pour les sessions Cloud, dans une variable d'environnement Cloud
   **personnelle** (jamais un environnement partagé en équipe/org — Claude Code
   Cloud n'a pas de coffre-fort à secrets, ces valeurs sont visibles en clair
-  par quiconque peut éditer l'environnement).
+  par quiconque peut éditer l'environnement). Jamais de secret GitHub
+  Actions : le token est utilisé directement par Claude Code (local ou
+  Cloud), pas par une CI GitHub.
 - Ne jamais afficher le token en clair dans une commande, un log ou une
-  réponse (pas d'`echo`, pas de `curl -v`).
+  réponse (pas d'`echo`, pas de `curl -v`), jamais de remote git persistant
+  configuré avec ce token (ne doit jamais atterrir dans `.git/config`).
 
 ## Convention de nommage des branches
 
@@ -110,15 +164,24 @@ erreur ("Blocked issues not available for current license"). Seul le type
 ## Cycle de vie d'une tâche
 
 1. L'issue existe sur GitLab (créée via `/backlog-gitlab` ou manuellement).
-2. Créer la branche GitHub selon la convention ci-dessus.
-3. Développer, committer normalement.
-4. **Ne jamais committer ni pousser sans validation humaine explicite.**
-   Le fichier marqueur `.claude/validated` doit exister avant tout `git commit`
-   ou `git push`. Il est créé uniquement par l'utilisateur après ses propres
-   tests manuels (commande `/valide`). Le supprimer après usage.
-5. À la clôture : mettre à jour l'issue/epic GitLab correspondante via l'API
-   (commentaire + fermeture si le travail est terminé), et ajouter une entrée
-   dans `docs/JOURNAL.md`.
+2. Créer la branche locale selon la convention ci-dessus (skill `/tache`).
+3. Développer, committer localement au fil de l'eau si besoin — mais tout
+   push (GitHub ou GitLab) et toute Merge Request restent conditionnés à une
+   validation humaine explicite, voir ci-dessous.
+4. **Le gate n'est pas un fichier, c'est une phrase explicite de
+   l'utilisateur dans la conversation** (skill `/livre`) :
+   - **"tu peux commiter"** → commit (si nécessaire) + push de la branche sur
+     GitHub *et* GitLab + ouverture d'une Merge Request GitLab (branche →
+     `main`). Pas de merge.
+   - **"tu peux commiter et merger"** → tout ce qui précède, **plus** le
+     merge de la Merge Request, la resynchronisation de `main` GitHub depuis
+     GitLab, et un commentaire sur l'issue liée.
+5. **La review réelle a lieu sur la Merge Request GitLab** — lecture du
+   diff, approbation, merge : c'est le vrai point de décision humaine, pas un
+   artefact local.
+6. Fermer l'issue/epic GitLab reste une action **distincte et délibérée**,
+   jamais automatique même après un merge — et ajouter une entrée dans
+   `docs/JOURNAL.md` à la clôture réelle.
 
 ## Mémoire de session
 
@@ -130,7 +193,10 @@ erreur ("Blocked issues not available for current license"). Seul le type
 
 ## Ce que Claude ne doit jamais faire seul
 
-- Merger une branche sans validation humaine explicite.
+- Committer directement sur `main` (toujours via une branche + Merge Request).
+- Pousser une branche (GitHub ou GitLab) ou ouvrir une Merge Request sans la
+  phrase de validation explicite ("tu peux commiter" / "tu peux commiter et
+  merger").
+- Merger une Merge Request sans le "... et merger" explicite.
 - Fermer une issue ou un epic sans confirmation que le travail est réellement livré.
 - Modifier les règles de protection de branche ou les permissions GitLab/GitHub.
-- Committer si `.claude/validated` est absent.
