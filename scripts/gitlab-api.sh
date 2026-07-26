@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
-# Point de passage unique pour tous les appels à l'API GitLab (REST + GraphQL).
-# Voir CLAUDE.md > "Accès" pour la doctrine associée.
+# Point de passage unique pour tous les appels à l'API GitLab (REST + GraphQL)
+# ainsi que le push/fetch git vers le projet GitLab du dépôt courant. Un seul
+# token (GITLAB_TOKEN, scopé groupe) pour tous ces usages — voir CLAUDE.md >
+# Sécurité du token GitLab.
 #
 # Usage en CLI :
 #   scripts/gitlab-api.sh rest <METHOD> <path> [json_body]
 #   scripts/gitlab-api.sh graphql <query_or_mutation> [variables_json]
+#   scripts/gitlab-api.sh push <local_ref> <remote_branch>
+#   scripts/gitlab-api.sh fetch <remote_branch>
 #
 # Usage en tant que lib (source) :
 #   source scripts/gitlab-api.sh
 #   gitlab_rest GET "projects/123/issues"
 #   gitlab_graphql 'query { ... }' '{"var": "val"}'
+#   gitlab_git push main main
+#   gitlab_git fetch main
 
 set -euo pipefail
 
@@ -21,6 +27,13 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
   set +a
 fi
 
+if [ -f "$SCRIPT_DIR/.claude/gitlab-project.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "$SCRIPT_DIR/.claude/gitlab-project.env"
+  set +a
+fi
+
 : "${GITLAB_API_URL:=https://gitlab.com/api/v4}"
 : "${GITLAB_GRAPHQL_URL:=https://gitlab.com/api/graphql}"
 
@@ -29,6 +42,36 @@ require_token() {
     echo "Erreur: GITLAB_TOKEN absent. Renseigne-le dans .env (voir .env.example)." >&2
     exit 1
   fi
+}
+
+require_project() {
+  if [ -z "${GITLAB_PROJECT_PATH:-}" ]; then
+    echo "Erreur: GITLAB_PROJECT_PATH absent. Renseigne-le dans .claude/gitlab-project.env." >&2
+    exit 1
+  fi
+}
+
+# gitlab_git push <local_ref> <remote_branch>
+# gitlab_git fetch <remote_branch>
+gitlab_git() {
+  require_token
+  require_project
+  local action="$1"
+  local url="https://oauth2:${GITLAB_TOKEN}@gitlab.com/${GITLAB_PROJECT_PATH}.git"
+  case "$action" in
+    push)
+      local local_ref="$2" remote_branch="$3"
+      git push "$url" "${local_ref}:refs/heads/${remote_branch}"
+      ;;
+    fetch)
+      local remote_branch="$2"
+      git fetch "$url" "$remote_branch"
+      ;;
+    *)
+      echo "Usage: gitlab_git push <local_ref> <remote_branch> | fetch <remote_branch>" >&2
+      exit 1
+      ;;
+  esac
 }
 
 # gitlab_rest <METHOD> <path> [json_body]
@@ -90,9 +133,13 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   case "$cmd" in
     rest) gitlab_rest "$@" ;;
     graphql) gitlab_graphql "$@" ;;
+    push) gitlab_git push "$@" ;;
+    fetch) gitlab_git fetch "$@" ;;
     *)
       echo "Usage: $0 rest <METHOD> <path> [json_body]" >&2
       echo "       $0 graphql <query_or_mutation> [variables_json]" >&2
+      echo "       $0 push <local_ref> <remote_branch>" >&2
+      echo "       $0 fetch <remote_branch>" >&2
       exit 1
       ;;
   esac
