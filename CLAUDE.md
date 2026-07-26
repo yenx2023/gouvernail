@@ -117,9 +117,9 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
   ce qui permet de le créer **une seule fois** et de le réutiliser tel quel
   pour tout nouveau projet créé dans ce groupe (voir Réutiliser ce framework
   pour un nouveau projet) : jamais besoin d'en recréer un par projet.
-- Permissions nécessaires (testées en conditions réelles le 2026-07-26 pour
-  la partie API backlog ; la partie push/MR reste à confirmer au premier
-  test réel du skill `/livre`) :
+- Permissions nécessaires (testées en conditions réelles le 2026-07-26,
+  y compris `git push` et création/merge de Merge Request via le skill
+  `/livre` — le token en place couvre déjà tout ce qui suit) :
   - **Group and project permissions → Groups → `Group: Read`**
   - **Group and project permissions → Project Planning → `Work Item: Create,
     Read, Update, Delete`** — autorise la création d'issues via la mutation
@@ -127,13 +127,14 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
   - **User permissions → `Project: Create`** — nécessaire pour créer un
     projet dans le groupe (catégorie distincte de "Group and project
     permissions", facile à manquer).
-  - **Group and project permissions → Repository → `Repository: Write`** —
-    pousser des branches. Libellé exact non encore vérifié en conditions
-    réelles.
-  - Création/merge de **Merge Requests** — permission exacte non encore
-    identifiée dans le catalogue fine-grained, à découvrir au premier test
-    (si 403 `insufficient_granular_scope`, le message indique la permission
-    manquante).
+  - Une permission de type **Repository: Write** (push de branches) — le
+    libellé exact retenu par l'utilisateur à la création n'a pas été
+    ré-inspecté via l'API (nécessiterait la permission additionnelle
+    `Personal Access Token: Read` rien que pour lire les scopes du token
+    lui-même) ; fonctionnellement confirmé : `git push` vers GitLab a
+    réussi sans 403.
+  - Une permission couvrant la **création et le merge de Merge Requests** —
+    même remarque, fonctionnellement confirmé (MR créée sans erreur).
   - La création de Milestones et les liens `relates_to` ont fonctionné sans
     permission "Milestone"/"Issue Link" dédiée trouvée dans le formulaire —
     probablement couverts implicitement par l'accès projet de base.
