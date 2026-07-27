@@ -35,6 +35,25 @@ GitLab, lui, n'a pas besoin de changer d'un projet à l'autre : scopé au
 groupe, il fonctionne tel quel pour tout nouveau projet créé dans ce groupe
 (voir Sécurité du token GitLab).
 
+### Skills de cadrage (claude-mastery)
+
+Les skills `interroge`, `cadre`, `planifie`, `design`, `investigue`,
+`illustre` sont vendorisés depuis
+[`naiersaidane/claude-mastery`](https://github.com/naiersaidane/claude-mastery)
+(MIT, licence copiée dans `.claude/skills/LICENSE-claude-mastery`) —
+copiés tels quels dans `.claude/skills/`, à reporter dans chaque nouveau
+projet au même titre que `/backlog-gitlab`/`/tache`/`/livre`.
+
+**Ses skills `branche` et `livre` sont volontairement exclus** : ils font
+respectivement une branche générique `feat/`/`fix/` sans lien avec une issue
+GitLab, et une Pull Request GitHub sans passer par GitLab — moins complets
+que `/tache` (branche liée à une issue GitLab) et `/livre` (Merge Request
+GitLab, pas juste une PR GitHub) déjà présents dans ce framework. Règle de
+principe si claude-mastery publie un nouveau skill qui recoupe l'existant :
+**garder claude-mastery si équivalent, garder le custom de ce framework s'il
+est strictement plus complet** — décision de l'utilisateur, voir mémoire
+`feedback` associée.
+
 ## Doctrine (à ne jamais enfreindre)
 
 - **GitLab est la seule source de vérité projet** : backlog, epics, issues, jalons,
