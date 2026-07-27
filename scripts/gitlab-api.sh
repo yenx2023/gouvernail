@@ -51,6 +51,30 @@ require_project() {
   fi
 }
 
+# curl_with_retry <curl_args...> -w '%{http_code}' -o <tmp_file> <url>
+# Réessaie jusqu'à 3 fois (backoff 1s/2s/4s) sur 429 ou 5xx — erreurs
+# transitoires typiques d'une exécution autonome (Claude Code Cloud) sans
+# supervision humaine pour relancer manuellement. N'affecte jamais les
+# erreurs 4xx logiques (400/401/403/404), qui remontent immédiatement.
+curl_with_retry() {
+  local attempt=1 max_attempts=3 delay=1 http_code
+  while true; do
+    http_code="$(curl "$@")"
+    if [ "$http_code" -lt 429 ] || { [ "$http_code" -gt 429 ] && [ "$http_code" -lt 500 ]; }; then
+      echo "$http_code"
+      return 0
+    fi
+    if [ "$attempt" -ge "$max_attempts" ]; then
+      echo "$http_code"
+      return 0
+    fi
+    echo "Avertissement: HTTP $http_code (tentative $attempt/$max_attempts), nouvel essai dans ${delay}s..." >&2
+    sleep "$delay"
+    attempt=$((attempt + 1))
+    delay=$((delay * 2))
+  done
+}
+
 # gitlab_git push <local_ref> <remote_branch>
 # gitlab_git fetch <remote_branch>
 gitlab_git() {
@@ -85,7 +109,7 @@ gitlab_rest() {
   fi
   local tmp http_code
   tmp="$(mktemp)"
-  http_code="$(curl "${args[@]}" -w '%{http_code}' -o "$tmp" "$url")"
+  http_code="$(curl_with_retry "${args[@]}" -w '%{http_code}' -o "$tmp" "$url")"
   if [ "$http_code" -ge 400 ]; then
     echo "Erreur HTTP $http_code sur $method $url" >&2
     jq . "$tmp" >&2 2>/dev/null || cat "$tmp" >&2
@@ -104,7 +128,7 @@ gitlab_graphql() {
   local payload tmp http_code
   payload="$(jq -n --arg q "$query" --argjson vars "$variables" '{query: $q, variables: $vars}')"
   tmp="$(mktemp)"
-  http_code="$(curl -sS -X POST \
+  http_code="$(curl_with_retry -sS -X POST \
     -H "Authorization: Bearer ${GITLAB_TOKEN}" \
     -H "Content-Type: application/json" \
     --data "$payload" \

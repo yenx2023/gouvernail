@@ -72,9 +72,14 @@ Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
 Exécuter les étapes 1 à 5 du mode "revue" ci-dessus (ou vérifier qu'une MR
 ouverte existe déjà pour la branche), puis :
 
-7. Merger la Merge Request :
+7. Merger la Merge Request. L'API GitLab **exige le champ `sha`** (le
+   `sha` de la réponse d'ouverture de la MR à l'étape 5, ou récupéré via
+   `GET .../merge_requests/<iid>`) — un `PUT .../merge` sans ce champ échoue
+   avec `400 "SHA must be provided when merging"` (vérifié en conditions
+   réelles le 2026-07-27) :
    ```
-   scripts/gitlab-api.sh rest PUT "projects/${GITLAB_PROJECT_ID}/merge_requests/<iid>/merge"
+   scripts/gitlab-api.sh rest PUT "projects/${GITLAB_PROJECT_ID}/merge_requests/<iid>/merge" \
+     '{"sha":"<sha_de_la_mr>"}'
    ```
    Si le merge échoue (conflits, pipeline requis, etc.), s'arrêter et
    rapporter l'erreur — ne jamais forcer.
