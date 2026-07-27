@@ -22,3 +22,9 @@ et `livre` sont exclus au profit de `/tache` et `/livre` propres à ce
 framework, plus complets (liaison à une issue GitLab, Merge Request GitLab
 plutôt que Pull Request GitHub). Reporté dans `todo-cli`, premier projet
 amorcé avec ce framework.
+
+## 2026-07-27 — Issue #3 — `chore/3-renomme-gouvernail`
+
+Le framework est renommé `gitlab-facade` → **Gouvernail** (repo GitHub,
+projet GitLab, doctrine). Le dossier local reste nommé `gitlab-facade` pour
+ne pas perturber la session en cours — cosmétique, sans impact fonctionnel.
