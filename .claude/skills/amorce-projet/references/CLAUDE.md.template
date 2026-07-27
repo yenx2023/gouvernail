@@ -67,6 +67,26 @@ permissions et de la doctrine de stockage (jamais en clair, `.env` local +
 variable d'environnement Cloud personnelle, jamais de secret GitHub
 Actions).
 
+## Principes de conception (SOLID)
+
+Le code applicatif de ce projet suit les principes **SOLID** dès qu'une
+modélisation orientée objet ou modulaire est en jeu :
+
+- **S**ingle Responsibility — une classe/module a une seule raison de changer.
+- **O**pen/Closed — étendre par composition/abstraction plutôt que modifier
+  du code existant qui fonctionne.
+- **L**iskov Substitution — une sous-classe doit pouvoir remplacer sa classe
+  mère sans surprendre l'appelant.
+- **I**nterface Segregation — plusieurs interfaces ciblées plutôt qu'une
+  interface générale que personne n'utilise en entier.
+- **D**ependency Inversion — dépendre d'abstractions, pas d'implémentations
+  concrètes, pour les dépendances qui varient.
+
+Ça ne justifie pas l'abstraction prématurée : appliquer ces principes au
+moment où la complexité le justifie réellement (deuxième implémentation,
+point d'extension concret) — pas en préparant hypothétiquement l'avenir.
+Trois lignes similaires valent mieux qu'une abstraction anticipée.
+
 ## Convention de nommage des branches
 
 - Format : `<type>/<numero-issue-gitlab>-<slug-court>`
