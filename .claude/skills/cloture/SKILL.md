@@ -1,17 +1,20 @@
 ---
 name: cloture
-description: Ferme une issue GitLab suite à confirmation explicite que le travail est réellement livré — action distincte et délibérée, jamais automatique même après un merge (voir CLAUDE.md > Cycle de vie d'une tâche). Usage : /cloture <numero-issue>
+description: Ferme une issue GitLab en dehors du flux normal de merge — `/livre` (mode "merge") ferme déjà automatiquement l'issue et son milestone quand le merge explicite en confirme la livraison. Ce skill couvre les exceptions (décision sans code livré, doublon, rattrapage d'une clôture manquée), toujours sur invocation explicite. Usage : /cloture <numero-issue>
 ---
 
 # cloture
 
 ## Objectif
 
-Fournir un mécanisme cohérent pour l'étape 6 du "Cycle de vie d'une tâche"
-(voir CLAUDE.md) : fermer une issue GitLab après confirmation que le travail
-est réellement livré. Avant ce skill, cette étape se faisait via des appels
-`gitlab-api.sh` ad hoc, avec un risque d'entrées `docs/JOURNAL.md`
-incohérentes d'une clôture à l'autre.
+Fermer une issue GitLab **en dehors** du flux normal — `/livre` (mode
+"merge") ferme désormais l'issue et, le cas échéant, son milestone
+automatiquement dès que le merge explicite confirme la livraison (voir
+CLAUDE.md > Cycle de vie d'une tâche). Ce skill couvre les cas où ce flux ne
+s'applique pas : une issue tranchée sans code livré (doublon, non
+pertinente, décision de ne pas la faire), ou le rattrapage d'une clôture
+manquée. Toujours sur invocation explicite avec le numéro d'issue — jamais
+en réaction à une simple mention en conversation.
 
 Ce skill ne touche jamais au code, à git, ni aux Merge Requests — il ferme
 une issue déjà livrée et met à jour la trace correspondante dans

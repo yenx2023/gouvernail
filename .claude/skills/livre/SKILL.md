@@ -89,20 +89,39 @@ ouverte existe déjà pour la branche), puis :
    scripts/gitlab-api.sh fetch main
    git push origin FETCH_HEAD:main
    ```
-9. Commenter (jamais fermer automatiquement) l'issue GitLab liée, via
-   `scripts/gitlab-api.sh` (le `GITLAB_TOKEN` API a déjà les droits
-   nécessaires sur les issues) :
+9. Commenter puis **fermer** l'issue GitLab liée — le merge explicite
+   ("tu peux commiter et merger") **est** la confirmation de livraison, la
+   fermeture n'a plus besoin d'être redemandée séparément :
    ```
    scripts/gitlab-api.sh rest POST "projects/${GITLAB_PROJECT_ID}/issues/<numero>/notes" \
      '{"body":"Livré via Merge Request <web_url>."}'
+   scripts/gitlab-api.sh rest PUT "projects/${GITLAB_PROJECT_ID}/issues/<numero>" \
+     '{"state_event":"close"}'
    ```
-10. Ajouter une entrée dans `docs/JOURNAL.md` (créer le fichier avec un
+10. **Fermer le milestone associé si c'était sa dernière issue ouverte.**
+    Lire le `milestone.id` de l'issue (déjà dans la réponse de l'étape
+    précédente), puis vérifier s'il reste des issues ouvertes dedans :
+    ```
+    scripts/gitlab-api.sh rest GET "projects/${GITLAB_PROJECT_ID}/issues?milestone_id=<milestone_id>&state=opened"
+    ```
+    Si la liste est vide, fermer le milestone :
+    ```
+    scripts/gitlab-api.sh rest PUT "projects/${GITLAB_PROJECT_ID}/milestones/<milestone_id>" \
+      '{"state_event":"close"}'
+    ```
+    Si l'issue n'a pas de milestone, sauter cette étape.
+11. Ajouter une entrée dans `docs/JOURNAL.md` (créer le fichier avec un
     titre "# Journal" s'il n'existe pas) : date du jour, numéro d'issue,
     nom de branche, résumé en une phrase du travail livré.
-11. Récapituler à l'utilisateur : MR mergée (URL), `main` GitHub
-    synchronisé, issue commentée, `docs/JOURNAL.md` mis à jour. Rappeler que
-    la fermeture de l'issue reste une étape séparée et délibérée — pas faite
-    automatiquement ici.
+12. Récapituler à l'utilisateur : MR mergée (URL), `main` GitHub
+    synchronisé, issue fermée (+ milestone fermé si c'était le cas),
+    `docs/JOURNAL.md` mis à jour.
+
+Pour fermer une issue **en dehors** de ce flux (décidée comme non
+pertinente, doublon, ou rattrapage d'une clôture manquée) : skill
+`/cloture <numero-issue>`, invoqué explicitement — jamais ce skill `/livre`
+ne doit fermer une issue qui n'est pas celle de la branche en cours de
+merge.
 
 ## Ce que ce skill ne doit jamais faire seul
 
@@ -112,6 +131,7 @@ ouverte existe déjà pour la branche), puis :
   mode "revue" vient d'être exécuté avec succès, ne pas enchaîner sur le
   merge sans nouvelle confirmation.
 - Committer directement sur `main`.
-- Fermer l'issue ou l'epic GitLab lié — se limiter à un commentaire.
+- Fermer une issue autre que celle de la branche en cours de merge, ou un
+  milestone qui a encore des issues ouvertes.
 - Forcer un merge en cas de conflit ou d'échec (`--force`, résolution
   automatique de conflit) : s'arrêter et rapporter à l'utilisateur.
