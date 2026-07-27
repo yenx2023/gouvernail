@@ -38,3 +38,13 @@ du projet — contredisant la doctrine "les skills ne codent jamais un projet
 en dur, ils lisent toujours ce fichier". Les deux skills utilisent
 désormais ce fichier comme défaut, ne redemandant que si le fichier est
 absent (ou si `--projet` surcharge explicitement le défaut pour `/tache`).
+
+## 2026-07-27 — `chore/livre-cloture-robustesse` (pas d'issue formelle)
+
+Corrige un bug découvert en mergeant réellement la MR de la correction
+précédente : le `PUT .../merge_requests/<iid>/merge` de GitLab exige un
+champ `sha`, non documenté dans `/livre`. Ajoute un retry avec backoff
+exponentiel sur les erreurs transitoires (429/5xx) dans
+`scripts/gitlab-api.sh`, utile en exécution autonome sans supervision. Ajoute
+le skill `/cloture` pour fermer une issue proprement après confirmation de
+livraison (comblait un vide entre la doctrine et l'outillage).
