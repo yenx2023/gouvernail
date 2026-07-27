@@ -57,3 +57,15 @@ moment). `/tache` utilise ce label directement sans redemander à
 l'utilisateur — ne retombe sur une déduction + confirmation que si le
 label est absent. Corrige un défaut repéré en conditions réelles sur
 `todo-cli` (issue #5).
+
+## 2026-07-27 — `chore/skill-amorce-projet` (pas d'issue formelle)
+
+Ajoute le skill `/amorce-projet <chemin-cible>` pour automatiser la section
+"Réutiliser ce framework pour un nouveau projet" de `CLAUDE.md`, jusqu'ici
+100% manuelle. Crée le projet GitLab et le dépôt GitHub dédiés (via `gh`),
+copie l'outillage (`.claude/skills/`, `scripts/gitlab-api.sh`) et génère un
+`CLAUDE.md` adapté depuis un gabarit, en gardant une validation utilisateur
+explicite à chaque action mutante externe. Conçu à partir de l'inspection
+du précédent réel `todo-cli` (fichiers copiés, structure de `CLAUDE.md`,
+séquence git avec commit de genèse direct sur `main`). N'est jamais copié
+dans les nouveaux projets — outil méta propre à Gouvernail.
