@@ -151,6 +151,40 @@ gitlab_graphql() {
   rm -f "$tmp"
 }
 
+# parse_issue_from_branch <nom_branche>
+# Extrait le numéro d'issue GitLab d'un nom de branche <feature|fix|chore>/<numero>-<slug>.
+# N'extrait jamais un nombre trouvé ailleurs dans le slug (ex.
+# "chore/45-migrer-node-20" → 45, pas 20) : seul le nombre juste après le
+# type et avant le premier tiret compte.
+parse_issue_from_branch() {
+  local branch="$1"
+  if [[ "$branch" =~ ^(feature|fix|chore)/([0-9]+)- ]]; then
+    echo "${BASH_REMATCH[2]}"
+  else
+    echo "Erreur: impossible d'extraire un numéro d'issue de la branche '$branch' (attendu <feature|fix|chore>/<numero>-<slug>)" >&2
+    return 1
+  fi
+}
+
+# milestone_is_empty <project_id> <milestone_id>
+# Vrai (exit 0) si le milestone n'a plus aucune issue ouverte, faux (exit 1) sinon.
+milestone_is_empty() {
+  local project_id="$1" milestone_id="$2"
+  local open_count
+  open_count="$(gitlab_rest GET "projects/${project_id}/issues?milestone_id=${milestone_id}&state=opened" | jq 'length')"
+  [ "$open_count" -eq 0 ]
+}
+
+# merge_request_sha <project_id> <mr_iid>
+# Récupère le sha courant d'une Merge Request, requis par l'API de merge
+# GitLab (PUT .../merge exige ce champ). Utile quand le mode "merge" de
+# /livre est invoqué séparément du mode "revue" qui avait ouvert la MR
+# (ex. reprise dans une session ultérieure sans le sha déjà en main).
+merge_request_sha() {
+  local project_id="$1" mr_iid="$2"
+  gitlab_rest GET "projects/${project_id}/merge_requests/${mr_iid}" | jq -r '.sha'
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   cmd="${1:-}"
   shift || true
@@ -159,11 +193,19 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     graphql) gitlab_graphql "$@" ;;
     push) gitlab_git push "$@" ;;
     fetch) gitlab_git fetch "$@" ;;
+    parse-issue) parse_issue_from_branch "$@" ;;
+    milestone-empty)
+      if milestone_is_empty "$@"; then echo true; else echo false; fi
+      ;;
+    mr-sha) merge_request_sha "$@" ;;
     *)
       echo "Usage: $0 rest <METHOD> <path> [json_body]" >&2
       echo "       $0 graphql <query_or_mutation> [variables_json]" >&2
       echo "       $0 push <local_ref> <remote_branch>" >&2
       echo "       $0 fetch <remote_branch>" >&2
+      echo "       $0 parse-issue <nom_branche>" >&2
+      echo "       $0 milestone-empty <project_id> <milestone_id>" >&2
+      echo "       $0 mr-sha <project_id> <mr_iid>" >&2
       exit 1
       ;;
   esac

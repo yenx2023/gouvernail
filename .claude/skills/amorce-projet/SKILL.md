@@ -89,6 +89,9 @@ exception documentée à l'interdit de commit direct).
    - `.claude/skills/` en entier — **tous** les sous-dossiers de skills sauf
      `amorce-projet/` lui-même — plus `LICENSE-claude-mastery`.
    - `scripts/gitlab-api.sh`
+   - `tests/gitlab-api.test.sh` (filet de sécurité pour `scripts/gitlab-api.sh`,
+     cohérent avec la section "Tests" du gabarit `CLAUDE.md` généré à l'étape
+     suivante)
    - `.env.example`
    - `.gitignore`
 

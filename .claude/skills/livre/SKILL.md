@@ -36,9 +36,14 @@ Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
 - Être sur une branche de travail nommée selon la convention
   `<type>/<numero-issue>-<slug>` (créée par le skill `/tache`) — **jamais sur
   `main`**. Si la branche courante est `main`, s'arrêter : rien à livrer.
-- Le numéro d'issue est extrait du nom de branche. Ce skill suppose que
-  l'issue vit sur le même projet GitLab que le code — l'identité du projet
-  (chemin + id) est décrite dans `.claude/gitlab-project.env`
+- Le numéro d'issue est extrait du nom de branche via
+  `scripts/gitlab-api.sh parse-issue <branche>` — jamais par une lecture
+  manuelle du nom, pour ne pas confondre le numéro d'issue avec un nombre
+  présent ailleurs dans le slug (ex. `chore/45-migrer-node-20` → `45`, pas
+  `20`). Si la commande échoue (branche hors convention), s'arrêter et
+  rapporter l'erreur plutôt que de deviner. Ce skill suppose que l'issue vit
+  sur le même projet GitLab que le code — l'identité du projet (chemin + id)
+  est décrite dans `.claude/gitlab-project.env`
   (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`), jamais codée en dur ici. Ce
   fichier est ce qui change quand ce framework est réutilisé dans un nouveau
   dépôt pour un nouveau projet (voir CLAUDE.md > Réutiliser ce framework pour
@@ -55,8 +60,9 @@ Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
 3. `git push origin <branche>` (GitHub, pour la continuité Cloud).
 4. `scripts/gitlab-api.sh push <branche> <branche>` (pousse la même branche
    sur GitLab).
-5. Extraire le numéro d'issue du nom de branche. Charger l'identité du projet
-   (`source .claude/gitlab-project.env`) puis ouvrir la Merge Request :
+5. Extraire le numéro d'issue : `numero="$(scripts/gitlab-api.sh parse-issue <branche>)"`.
+   Charger l'identité du projet (`source .claude/gitlab-project.env`) puis
+   ouvrir la Merge Request :
    ```
    scripts/gitlab-api.sh rest POST "projects/${GITLAB_PROJECT_ID}/merge_requests" \
      '{"source_branch":"<branche>","target_branch":"main","title":"<titre>","description":"Closes #<numero>"}'
@@ -72,11 +78,13 @@ Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
 Exécuter les étapes 1 à 5 du mode "revue" ci-dessus (ou vérifier qu'une MR
 ouverte existe déjà pour la branche), puis :
 
-7. Merger la Merge Request. L'API GitLab **exige le champ `sha`** (le
-   `sha` de la réponse d'ouverture de la MR à l'étape 5, ou récupéré via
-   `GET .../merge_requests/<iid>`) — un `PUT .../merge` sans ce champ échoue
-   avec `400 "SHA must be provided when merging"` (vérifié en conditions
-   réelles le 2026-07-27) :
+7. Merger la Merge Request. L'API GitLab **exige le champ `sha`** — un
+   `PUT .../merge` sans ce champ échoue avec `400 "SHA must be provided when
+   merging"` (vérifié en conditions réelles le 2026-07-27). Utiliser le `sha`
+   de la réponse d'ouverture de la MR à l'étape 5 s'il est encore en main ;
+   sinon (ex. mode "merge" invoqué dans une session distincte de celle qui a
+   ouvert la MR en mode "revue", sha non disponible), le récupérer via
+   `scripts/gitlab-api.sh mr-sha ${GITLAB_PROJECT_ID} <iid>` :
    ```
    scripts/gitlab-api.sh rest PUT "projects/${GITLAB_PROJECT_ID}/merge_requests/<iid>/merge" \
      '{"sha":"<sha_de_la_mr>"}'
@@ -102,9 +110,9 @@ ouverte existe déjà pour la branche), puis :
     Lire le `milestone.id` de l'issue (déjà dans la réponse de l'étape
     précédente), puis vérifier s'il reste des issues ouvertes dedans :
     ```
-    scripts/gitlab-api.sh rest GET "projects/${GITLAB_PROJECT_ID}/issues?milestone_id=<milestone_id>&state=opened"
+    scripts/gitlab-api.sh milestone-empty ${GITLAB_PROJECT_ID} <milestone_id>
     ```
-    Si la liste est vide, fermer le milestone :
+    Si la sortie est `true`, fermer le milestone :
     ```
     scripts/gitlab-api.sh rest PUT "projects/${GITLAB_PROJECT_ID}/milestones/<milestone_id>" \
       '{"state_event":"close"}'
