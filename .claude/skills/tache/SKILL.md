@@ -59,19 +59,31 @@ lien traçable entre le travail GitHub et le work item GitLab.
    Si l'appel échoue (issue inexistante, etc.), s'arrêter et rapporter
    l'erreur — ne pas continuer sur une hypothèse.
 
-3. **Déterminer le type de branche** (`feature`/`fix`/`chore`) à partir des
-   labels et du titre de l'issue (ex. label `bug` → `fix`). En l'absence
-   d'indice clair, proposer `feature` par défaut. Dans tous les cas,
-   présenter le type déduit à l'utilisateur pour confirmation avant de
-   continuer — ne jamais trancher silencieusement une ambiguïté.
+3. **Déterminer le type de branche** (`feature`/`fix`/`chore`). Si l'issue
+   porte déjà un label `feature`, `fix` ou `chore` — posé par
+   `/backlog-gitlab` au moment de la création, qui a le contexte complet du
+   PRD/PLAN pour bien le déterminer — **l'utiliser directement, sans
+   redemander à l'utilisateur** : cette décision a déjà été prise avec plus
+   de contexte qu'on n'en aura jamais ici. Seulement si l'issue n'a **aucun**
+   de ces trois labels (créée manuellement, ou par un ancien backlog
+   antérieur à cette convention) : déduire au mieux du titre (ex. mots
+   "corriger"/"bug" → `fix`), proposer `feature` par défaut si aucun indice,
+   et **dans ce seul cas** présenter la déduction à l'utilisateur pour
+   confirmation avant de continuer.
 
 4. **Générer un slug court** à partir du titre de l'issue : minuscules,
    sans accents, mots séparés par des tirets, limité à 4-5 mots
    significatifs (ex. "Générer le PDF côté serveur" → `generer-pdf-serveur`).
 
-5. **Composer le nom de branche** `<type>/<numero>-<slug>` et le présenter à
-   l'utilisateur. Attendre sa validation avant de créer quoi que ce soit
-   (l'utilisateur peut ajuster le slug ou le type proposés).
+5. **Composer le nom de branche** `<type>/<numero>-<slug>`. Le slug est une
+   fonction mécanique du titre, sans ambiguïté à trancher : si le type venait
+   d'un label (cas normal, voir étape 3), **procéder directement à la
+   création sans demander d'approbation préalable** — la branche est locale,
+   jamais poussée avant la phrase de validation explicite du skill `/livre`,
+   donc sans risque à créer directement. Le nom choisi est rapporté à
+   l'utilisateur au récapitulatif (étape 8), pas avant. Seule exception : si
+   le type venait du repli sans label (étape 3, cas rare), la confirmation
+   déjà obtenue à cette étape couvre aussi le nom de branche final.
 
 6. **Vérifier l'état du dépôt local** : `git status` doit être propre.
    S'assurer d'être sur la branche principale (`main`) et à jour avec
