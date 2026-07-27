@@ -28,3 +28,13 @@ amorcé avec ce framework.
 Le framework est renommé `gitlab-facade` → **Gouvernail** (repo GitHub,
 projet GitLab, doctrine). Le dossier local reste nommé `gitlab-facade` pour
 ne pas perturber la session en cours — cosmétique, sans impact fonctionnel.
+
+## 2026-07-27 — `chore/corrige-resolution-projet-gitlab` (pas d'issue formelle)
+
+Corrige une incohérence entre skills : `/livre` résolvait déjà le projet
+GitLab cible depuis `.claude/gitlab-project.env` sans jamais le redemander,
+mais `/tache` et `/backlog-gitlab` redemandaient systématiquement le chemin
+du projet — contredisant la doctrine "les skills ne codent jamais un projet
+en dur, ils lisent toujours ce fichier". Les deux skills utilisent
+désormais ce fichier comme défaut, ne redemandant que si le fichier est
+absent (ou si `--projet` surcharge explicitement le défaut pour `/tache`).
