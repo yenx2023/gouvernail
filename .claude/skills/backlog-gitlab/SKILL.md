@@ -76,9 +76,16 @@ n'a pas changé.
 
 2. **Lire le PRD/PLAN**, extraire une structure Milestone → Issues (thèmes
    ou phases de haut niveau = Milestones candidats, tâches concrètes et
-   actionnables = Issues). **Présenter ce découpage à l'utilisateur et
-   attendre sa validation avant toute écriture sur GitLab** — jamais de
-   création silencieuse en masse.
+   actionnables = Issues). **Pour chaque Issue, déterminer dès maintenant
+   son type de branche** (`feature`/`fix`/`chore`, voir CLAUDE.md > Convention
+   de nommage des branches) à partir de ce que l'Issue accomplit réellement —
+   `fix` si elle corrige un défaut existant, `chore` si c'est de la
+   maintenance/outillage non fonctionnel, `feature` par défaut (nouvelle
+   capacité). C'est le moment où ce jugement est le plus fiable : le contexte
+   complet du PRD/PLAN est disponible, contrairement à `/tache` qui ne verra
+   plus tard que le titre de l'issue isolé. **Présenter ce découpage (avec le
+   type de chaque Issue) à l'utilisateur et attendre sa validation avant
+   toute écriture sur GitLab** — jamais de création silencieuse en masse.
 
 3. **Créer chaque Milestone validé** via REST :
    ```
@@ -99,12 +106,16 @@ n'a pas changé.
      '{"projectPath":"<groupe>/<projet>","title":"<titre>","description":"<description>"}'
    ```
    Vérifier `errors` dans la réponse ; si non vide, s'arrêter et rapporter à
-   l'utilisateur plutôt que de continuer. Puis rattacher au Milestone (et
-   poser les labels si prévus) via REST, avec l'`iid` renvoyé :
+   l'utilisateur plutôt que de continuer. Puis rattacher au Milestone via
+   REST, avec l'`iid` renvoyé — **toujours inclure le label de type
+   (`feature`/`fix`/`chore`) déterminé à l'étape 2**, en plus des labels
+   métier éventuels :
    ```
    scripts/gitlab-api.sh rest PUT "projects/<project_id>/issues/<iid>" \
-     '{"milestone_id":<id milestone>,"labels":"<label1,label2>"}'
+     '{"milestone_id":<id milestone>,"labels":"<feature|fix|chore>,<autres labels éventuels>"}'
    ```
+   Ce label est ce qui permet à `/tache` de déduire le type de branche sans
+   avoir à redemander à l'utilisateur — ne jamais l'omettre.
 
 5. **Lier les dépendances explicites entre tâches**, si le PRD/PLAN en
    indique (uniquement des relations simples, pas de blocage — voir
