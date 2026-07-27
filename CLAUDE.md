@@ -2,7 +2,7 @@
 
 ## Ce que ce dépôt est (et n'est pas)
 
-`gitlab-facade` est un **framework réutilisable** — la méthodologie et
+**Gouvernail** est un **framework réutilisable** — la méthodologie et
 l'outillage (doctrine, skills, scripts) pour développer *n'importe quel*
 projet avec Claude Code en suivant de vraies pratiques d'ingénierie : cadrage
 (claude-mastery : `/cadre`, `/planifie`...), gestion de backlog façon Scrum
@@ -13,14 +13,14 @@ tickets.
 
 **Ce dépôt lui-même n'héberge jamais de "vrai" projet produit.** Son propre
 développement (le framework qui s'améliore) suit néanmoins ce même GitLab
-Flow, sur son propre projet GitLab méta `ai-agent-projects/gitlab-facade` —
+Flow, sur son propre projet GitLab méta `ai-agent-projects/gouvernail` —
 c'est un cas normal d'auto-hébergement, pas une exception à la règle
 ci-dessus.
 
 ### Réutiliser ce framework pour un nouveau projet
 
 Chaque nouveau projet (cahier des charges → application livrée) a sa **propre
-paire** dépôt GitHub + projet GitLab, distincte de celles de `gitlab-facade`.
+paire** dépôt GitHub + projet GitLab, distincte de celles de `Gouvernail`.
 GitHub n'existe que parce que Claude Code Cloud l'impose (voir Doctrine
 ci-dessous) — GitLab reste la seule source de vérité, y compris pour ce
 nouveau projet.
