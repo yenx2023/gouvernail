@@ -1,0 +1,116 @@
+# CLAUDE.md — Conventions du projet
+
+## À propos de ce projet
+
+`{{PROJET_NOM}}` : {{PROJET_DESCRIPTION}}
+
+L'outillage ci-dessous (`scripts/gitlab-api.sh`, skills
+`/backlog-gitlab`/`/tache`/`/livre`/`/cloture`, doctrine) est une copie de
+celui du framework [**Gouvernail**](https://github.com/yenx2023/gouvernail),
+amorcé via son skill `/amorce-projet` — toute amélioration générique
+découverte ici devrait être reportée dans le framework, pas seulement
+corrigée localement.
+
+## Doctrine (à ne jamais enfreindre)
+
+- **GitLab est la seule source de vérité projet** : backlog, epics, issues, jalons,
+  décision de merge. C'est là que tout se décide.
+- **GitHub est une façade d'exécution technique**, imposée par Claude Code Cloud.
+  Il n'a aucune autorité : pas de review qui compte, pas de merge décisionnel,
+  pas de protection de branche significative. Le code y transite, rien de plus.
+- **La review et le merge réels se font via une Merge Request GitLab**
+  (GitLab Flow) — voir Cycle de vie d'une tâche. Le `main` GitHub est
+  resynchronisé après coup depuis GitLab, jamais l'inverse : ne jamais
+  pousser manuellement un `main` GitHub qui n'a pas d'abord été mergé côté
+  GitLab.
+
+### Vocabulaire : work items
+
+Depuis ses versions récentes, GitLab unifie Epics, Issues, Tasks, Incidents,
+etc. sous un modèle de données commun appelé **work item** — c'est ce que
+manipule l'API GraphQL Work Items utilisée par `scripts/gitlab-api.sh` et le
+skill `/backlog-gitlab` (`workItemCreate`, `workItemTypes`, `hierarchyWidget`
+pour les relations parent/enfant). Un Epic est un work item de type "Epic",
+une Issue un work item de type "Issue", etc. Les **Milestones** restent en
+dehors de ce modèle — c'est un concept GitLab séparé, toujours géré en REST
+classique (`/milestones`).
+
+### Limitation héritée : pas d'Epics sur ce projet (tier Free)
+
+Les **Epics nécessitent un abonnement GitLab Premium ou Ultimate** — le
+groupe `ai-agent-projects` est en tier Free. **Le backlog utilise les
+Milestones comme mécanisme de regroupement** à la place des Epics
+(thème/phase → Issues rattachées via `milestone_id`). Seul le type de lien
+`relates_to` fonctionne entre issues (`blocks`/`is_blocked_by` renvoient une
+erreur sur ce tier).
+
+## Accès
+
+- GitLab : via appels directs à l'API GitLab (REST v4
+  `https://gitlab.com/api/v4` + GraphQL `https://gitlab.com/api/graphql`),
+  authentifiés par un token dans la variable d'environnement `GITLAB_TOKEN`.
+  Toujours passer par le helper `scripts/gitlab-api.sh` (fonctions
+  `gitlab_rest`, `gitlab_graphql`, `gitlab_git`) plutôt que des appels
+  `curl`/`git push` ad hoc.
+- GitHub : accès natif Claude Code (local et Cloud), pour clone/branch/commit/push.
+- Identité du projet GitLab courant : `.claude/gitlab-project.env`
+  (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`) — jamais codée en dur dans les
+  scripts/skills, toujours lue depuis ce fichier.
+
+### Sécurité du token GitLab
+
+`GITLAB_TOKEN` : le **même token** que celui utilisé sur Gouvernail et
+tout autre projet du groupe `ai-agent-projects` — scopé au groupe, pas à un
+projet précis, créé une seule fois pour tout le groupe. Voir le `CLAUDE.md`
+de Gouvernail > Sécurité du token GitLab pour le détail des
+permissions et de la doctrine de stockage (jamais en clair, `.env` local +
+variable d'environnement Cloud personnelle, jamais de secret GitHub
+Actions).
+
+## Convention de nommage des branches
+
+- Format : `<type>/<numero-issue-gitlab>-<slug-court>`
+- Types : `feature`, `fix`, `chore`
+- Exemple : `feature/3-ajouter-fonctionnalite`
+- Le numéro d'issue GitLab est **obligatoire** dans le nom de branche : c'est
+  le seul lien traçable entre le travail GitHub et le work item GitLab.
+
+## Cycle de vie d'une tâche
+
+1. L'issue existe sur GitLab (créée via `/backlog-gitlab` ou manuellement).
+2. Créer la branche locale selon la convention ci-dessus (skill `/tache`).
+3. Développer, committer localement au fil de l'eau si besoin — mais tout
+   push (GitHub ou GitLab) et toute Merge Request restent conditionnés à une
+   validation humaine explicite, voir ci-dessous.
+4. **Le gate n'est pas un fichier, c'est une phrase explicite de
+   l'utilisateur dans la conversation** (skill `/livre`) :
+   - **"tu peux commiter"** → commit (si nécessaire) + push de la branche sur
+     GitHub *et* GitLab + ouverture d'une Merge Request GitLab (branche →
+     `main`). Pas de merge.
+   - **"tu peux commiter et merger"** → tout ce qui précède, **plus** le
+     merge de la Merge Request, la resynchronisation de `main` GitHub depuis
+     GitLab, et un commentaire sur l'issue liée.
+5. **La review réelle a lieu sur la Merge Request GitLab** — lecture du
+   diff, approbation, merge : c'est le vrai point de décision humaine, pas un
+   artefact local.
+6. Fermer l'issue GitLab reste une action **distincte et délibérée**, jamais
+   automatique même après un merge (skill `/cloture <numero-issue>`, qui
+   complète l'entrée `docs/JOURNAL.md` déjà créée par `/livre` au moment du
+   merge plutôt que d'en recréer une).
+
+## Mémoire de session
+
+- `docs/JOURNAL.md` : journal chronologique des tâches livrées, une entrée par
+  clôture (date, numéro d'issue GitLab, branche, résumé). Toujours le lire en
+  début de session pour retrouver le contexte des sessions précédentes.
+
+## Ce que Claude ne doit jamais faire seul
+
+- Committer directement sur `main` (toujours via une branche + Merge Request
+  — seule exception : le commit de genèse d'amorçage initial, déjà fait).
+- Pousser une branche (GitHub ou GitLab) ou ouvrir une Merge Request sans la
+  phrase de validation explicite ("tu peux commiter" / "tu peux commiter et
+  merger").
+- Merger une Merge Request sans le "... et merger" explicite.
+- Fermer une issue sans confirmation que le travail est réellement livré.
+- Modifier les règles de protection de branche ou les permissions GitLab/GitHub.

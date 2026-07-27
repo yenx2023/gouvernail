@@ -25,16 +25,22 @@ GitHub n'existe que parce que Claude Code Cloud l'impose (voir Doctrine
 ci-dessous) — GitLab reste la seule source de vérité, y compris pour ce
 nouveau projet.
 
-Processus actuel : **manuel, étape par étape, validé par l'utilisateur à
-chaque étape** (pas de skill d'amorçage automatique pour l'instant). Ce qui
-change d'un projet à l'autre, concrètement, c'est le contenu de
+Amorçage semi-automatisé via le skill `/amorce-projet <chemin-cible>`,
+lancé depuis une session Claude Code ouverte sur **ce dépôt** (Gouvernail) :
+crée le projet GitLab et le dépôt GitHub dédiés, copie l'outillage vers le
+nouveau répertoire — chaque action mutante externe (création de projet,
+création de dépôt, push) reste **validée par l'utilisateur à chaque
+étape**, ce skill élimine la répétition mécanique, pas la validation
+humaine. `/amorce-projet` lui-même n'est **jamais** copié dans les nouveaux
+projets — c'est un outil méta propre à Gouvernail.
+
+Ce qui change d'un projet à l'autre, concrètement, c'est le contenu de
 `.claude/gitlab-project.env` (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`) —
 `scripts/gitlab-api.sh` et les skills (`/backlog-gitlab`, `/tache`, `/livre`,
 `/cloture`) ne codent jamais un projet en dur, ils lisent toujours ce
-fichier. Le token
-GitLab, lui, n'a pas besoin de changer d'un projet à l'autre : scopé au
-groupe, il fonctionne tel quel pour tout nouveau projet créé dans ce groupe
-(voir Sécurité du token GitLab).
+fichier. Le token GitLab, lui, n'a pas besoin de changer d'un projet à
+l'autre : scopé au groupe, il fonctionne tel quel pour tout nouveau projet
+créé dans ce groupe (voir Sécurité du token GitLab).
 
 ### Skills de cadrage (claude-mastery)
 
