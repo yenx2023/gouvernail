@@ -67,7 +67,7 @@ permissions et de la doctrine de stockage (jamais en clair, `.env` local +
 variable d'environnement Cloud personnelle, jamais de secret GitHub
 Actions).
 
-## Principes de conception (SOLID)
+## Principes de conception (SOLID + DRY)
 
 Le code applicatif de ce projet suit les principes **SOLID** dès qu'une
 modélisation orientée objet ou modulaire est en jeu :
@@ -81,11 +81,43 @@ modélisation orientée objet ou modulaire est en jeu :
   interface générale que personne n'utilise en entier.
 - **D**ependency Inversion — dépendre d'abstractions, pas d'implémentations
   concrètes, pour les dépendances qui varient.
+- **DRY** — éviter la duplication de logique, dans les mêmes limites que
+  ci-dessous : factoriser dès qu'une duplication réelle apparaît, pas par
+  anticipation.
 
 Ça ne justifie pas l'abstraction prématurée : appliquer ces principes au
 moment où la complexité le justifie réellement (deuxième implémentation,
-point d'extension concret) — pas en préparant hypothétiquement l'avenir.
-Trois lignes similaires valent mieux qu'une abstraction anticipée.
+point d'extension concret, duplication réellement constatée) — pas en
+préparant hypothétiquement l'avenir. Trois lignes similaires valent mieux
+qu'une abstraction anticipée.
+
+## Tests
+
+Toute fonctionnalité ou tout comportement modifié par une session autonome
+(notamment Claude Code Cloud, sans supervision continue) est couvert par au
+moins un test avant tout push — c'est le filet de sécurité qui permet à une
+tâche prise en autonomie totale d'être fiable sans qu'un humain relise
+chaque ligne avant la Merge Request. Pas d'objectif de couverture globale
+arbitraire : du code existant non touché sans test n'est pas un blocage, un
+comportement changé sans test l'est.
+
+## Gestion des erreurs
+
+Fail fast : pas de `try/catch` défensif pour un cas qui ne peut pas
+arriver, pas de fallback silencieux qui masque un bug, pas de validation
+dupliquée quand le langage/framework garantit déjà l'invariant. Ne valider
+qu'aux frontières du système (entrée utilisateur, API externe). Une erreur
+inattendue doit remonter clairement, jamais être avalée pour "que ça
+continue de tourner".
+
+## Dépendances
+
+Réutiliser l'existant (bibliothèque standard, code déjà présent dans le
+projet) avant d'ajouter une nouvelle dépendance. Une dépendance ajoutée
+doit être justifiée par un besoin réel, pas par confort — vérifier au
+minimum qu'elle est activement maintenue avant de l'introduire. Un agent
+autonome a tendance à résoudre par ajout de librairie plutôt que par code
+minimal : ce biais est à contrer explicitement.
 
 ## Convention de nommage des branches
 
