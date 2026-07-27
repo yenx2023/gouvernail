@@ -202,15 +202,18 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
      `main`). Pas de merge.
    - **"tu peux commiter et merger"** → tout ce qui précède, **plus** le
      merge de la Merge Request, la resynchronisation de `main` GitHub depuis
-     GitLab, et un commentaire sur l'issue liée.
+     GitLab, un commentaire sur l'issue liée, **la fermeture de cette issue**
+     et **du milestone associé si c'était sa dernière issue ouverte**. Le
+     merge explicite *est* la confirmation de livraison — pas besoin de la
+     redemander séparément pour la fermeture.
 5. **La review réelle a lieu sur la Merge Request GitLab** — lecture du
    diff, approbation, merge : c'est le vrai point de décision humaine, pas un
    artefact local.
-6. Fermer l'issue GitLab reste une action **distincte et délibérée**, jamais
-   automatique même après un merge (skill `/cloture <numero-issue>`, qui
-   complète l'entrée `docs/JOURNAL.md` déjà créée par `/livre` au moment du
-   merge plutôt que d'en recréer une). Pas d'Epics à fermer sur ce tier
-   (voir Limitation vérifiée ci-dessous).
+6. Fermer une issue **en dehors** de ce flux (décidée comme non pertinente,
+   doublon, ou rattrapage d'une clôture manquée) reste une action distincte
+   et délibérée, via le skill `/cloture <numero-issue>` invoqué
+   explicitement — jamais en réaction à une simple mention en conversation.
+   Pas d'Epics à fermer sur ce tier (voir Limitation vérifiée ci-dessous).
 
 ## Mémoire de session
 
@@ -227,5 +230,7 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
   phrase de validation explicite ("tu peux commiter" / "tu peux commiter et
   merger").
 - Merger une Merge Request sans le "... et merger" explicite.
-- Fermer une issue ou un epic sans confirmation que le travail est réellement livré.
+- Fermer une issue/milestone en dehors du merge d'une Merge Request qui la
+  referme (`/livre` mode "merge") ou de `/cloture` explicitement invoqué —
+  jamais en réaction à une simple mention en conversation.
 - Modifier les règles de protection de branche ou les permissions GitLab/GitHub.
