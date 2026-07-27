@@ -77,3 +77,13 @@ utilisé par `/amorce-projet` pour chaque nouveau projet, avec un garde-fou
 explicite contre l'abstraction prématurée (cohérence avec le reste de la
 doctrine anti-over-engineering). Ne s'applique qu'aux futurs projets amorcés
 — pas de rétro-application sur `todo-cli`.
+
+## 2026-07-27 — `chore/dry-tests-erreurs-dependances-template` (pas d'issue formelle)
+
+Complète le gabarit `CLAUDE.md` de `/amorce-projet` dans le même esprit que
+SOLID : section renommée "SOLID + DRY", et trois nouvelles sections Tests
+(filet de sécurité pour tout comportement changé par une session autonome),
+Gestion des erreurs (fail fast, pas de fallback silencieux) et Dépendances
+(réutiliser l'existant avant d'ajouter une librairie). Axes proposés en
+réponse à une demande explicite d'amélioration "dans le même sens que
+SOLID", sélectionnés par l'utilisateur parmi plusieurs candidats.
