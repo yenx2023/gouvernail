@@ -48,3 +48,12 @@ exponentiel sur les erreurs transitoires (429/5xx) dans
 `scripts/gitlab-api.sh`, utile en exécution autonome sans supervision. Ajoute
 le skill `/cloture` pour fermer une issue proprement après confirmation de
 livraison (comblait un vide entre la doctrine et l'outillage).
+
+## 2026-07-27 — Issue #4 — `fix/4-tache-label-type`
+
+`/backlog-gitlab` pose désormais un label `feature`/`fix`/`chore` sur
+chaque issue à sa création (contexte complet du PRD/PLAN disponible à ce
+moment). `/tache` utilise ce label directement sans redemander à
+l'utilisateur — ne retombe sur une déduction + confirmation que si le
+label est absent. Corrige un défaut repéré en conditions réelles sur
+`todo-cli` (issue #5).
