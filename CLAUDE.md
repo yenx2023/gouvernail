@@ -194,7 +194,9 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
 2. Créer la branche locale selon la convention ci-dessus (skill `/tache`).
 3. Développer, committer localement au fil de l'eau si besoin — mais tout
    push (GitHub ou GitLab) et toute Merge Request restent conditionnés à une
-   validation humaine explicite, voir ci-dessous.
+   validation humaine explicite, voir ci-dessous. Seule exception : le
+   **push de continuité** local ↔ Cloud (voir sous-section dédiée), qui n'a
+   pas besoin des phrases de `/livre`.
 4. **Le gate n'est pas un fichier, c'est une phrase explicite de
    l'utilisateur dans la conversation** (skill `/livre`) :
    - **"tu peux commiter"** → commit (si nécessaire) + push de la branche sur
@@ -215,6 +217,38 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
    explicitement — jamais en réaction à une simple mention en conversation.
    Pas d'Epics à fermer sur ce tier (voir Limitation vérifiée ci-dessous).
 
+### Push de continuité (switch local ↔ Cloud)
+
+Claude Code local et Claude Code Cloud sont deux environnements d'exécution
+séparés qui ne partagent ni historique de conversation ni mémoire auto —
+seul le code passe entre les deux, via GitHub (Cloud clone le dépôt GitHub à
+chaque nouvelle session ; le local ne voit ce qu'a fait Cloud qu'après un
+`git pull`). Continuer une même tâche en changeant d'environnement en cours
+de route nécessite donc de pousser la branche de travail sur GitHub **avant
+la fin de la tâche**, c'est-à-dire avant la phrase de validation habituelle
+("tu peux commiter" / "tu peux commiter et merger") qui, elle, reste
+réservée à la livraison finale.
+
+Ce **push de continuité** est distinct du push de livraison de `/livre` :
+
+- **Déclencheur** : une instruction ponctuelle et explicite de l'utilisateur
+  dans la conversation (ex. "pousse cette branche sur GitHub pour que je
+  continue en Cloud"), **pas** les phrases "tu peux commiter" / "tu peux
+  commiter et merger" — celles-ci restent le déclencheur du seul push de
+  livraison via `/livre`.
+- **Portée strictement limitée** : uniquement `git push` de la branche
+  courante vers **GitHub**. Jamais vers GitLab, jamais d'ouverture de Merge
+  Request, jamais de merge — ce push ne fait que rendre le code visible à
+  l'autre environnement, il n'est pas une étape du Cycle de vie d'une tâche.
+- **Retour côté local** : après une session Cloud, `git fetch`/`git pull` la
+  branche avant de continuer en local — pas d'action automatique attendue de
+  Claude ici, c'est une étape manuelle de reprise de session.
+- Le token GitLab et les skills (`/tache`, `/livre`, `/backlog-gitlab`,
+  `/cloture`) fonctionnent à l'identique en Cloud, à condition que
+  `GITLAB_TOKEN` soit configuré dans une variable d'environnement Cloud
+  personnelle (voir Sécurité du token GitLab) — rien de spécifique à ajouter
+  ici.
+
 ## Mémoire de session
 
 - `docs/JOURNAL.md` : journal chronologique des tâches livrées, une entrée par
@@ -228,7 +262,10 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
 - Committer directement sur `main` (toujours via une branche + Merge Request).
 - Pousser une branche (GitHub ou GitLab) ou ouvrir une Merge Request sans la
   phrase de validation explicite ("tu peux commiter" / "tu peux commiter et
-  merger").
+  merger") — **sauf le push de continuité local ↔ Cloud** (voir sous-section
+  dédiée), qui répond à une instruction ponctuelle explicite distincte, reste
+  limité à un `git push` GitHub de la branche courante, et n'ouvre jamais de
+  Merge Request ni ne touche GitLab.
 - Merger une Merge Request sans le "... et merger" explicite.
 - Fermer une issue/milestone en dehors du merge d'une Merge Request qui la
   referme (`/livre` mode "merge") ou de `/cloture` explicitement invoqué —
