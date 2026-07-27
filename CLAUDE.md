@@ -29,8 +29,9 @@ Processus actuel : **manuel, étape par étape, validé par l'utilisateur à
 chaque étape** (pas de skill d'amorçage automatique pour l'instant). Ce qui
 change d'un projet à l'autre, concrètement, c'est le contenu de
 `.claude/gitlab-project.env` (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`) —
-`scripts/gitlab-api.sh` et les skills (`/backlog-gitlab`, `/tache`, `/livre`)
-ne codent jamais un projet en dur, ils lisent toujours ce fichier. Le token
+`scripts/gitlab-api.sh` et les skills (`/backlog-gitlab`, `/tache`, `/livre`,
+`/cloture`) ne codent jamais un projet en dur, ils lisent toujours ce
+fichier. Le token
 GitLab, lui, n'a pas besoin de changer d'un projet à l'autre : scopé au
 groupe, il fonctionne tel quel pour tout nouveau projet créé dans ce groupe
 (voir Sécurité du token GitLab).
@@ -42,7 +43,7 @@ Les skills `interroge`, `cadre`, `planifie`, `design`, `investigue`,
 [`naiersaidane/claude-mastery`](https://github.com/naiersaidane/claude-mastery)
 (MIT, licence copiée dans `.claude/skills/LICENSE-claude-mastery`) —
 copiés tels quels dans `.claude/skills/`, à reporter dans chaque nouveau
-projet au même titre que `/backlog-gitlab`/`/tache`/`/livre`.
+projet au même titre que `/backlog-gitlab`/`/tache`/`/livre`/`/cloture`.
 
 **Ses skills `branche` et `livre` sont volontairement exclus** : ils font
 respectivement une branche générique `feat/`/`fix/` sans lien avec une issue
@@ -199,9 +200,11 @@ plus large en cas de compromission — accepté par l'utilisateur, voir mémoire
 5. **La review réelle a lieu sur la Merge Request GitLab** — lecture du
    diff, approbation, merge : c'est le vrai point de décision humaine, pas un
    artefact local.
-6. Fermer l'issue/epic GitLab reste une action **distincte et délibérée**,
-   jamais automatique même après un merge — et ajouter une entrée dans
-   `docs/JOURNAL.md` à la clôture réelle.
+6. Fermer l'issue GitLab reste une action **distincte et délibérée**, jamais
+   automatique même après un merge (skill `/cloture <numero-issue>`, qui
+   complète l'entrée `docs/JOURNAL.md` déjà créée par `/livre` au moment du
+   merge plutôt que d'en recréer une). Pas d'Epics à fermer sur ce tier
+   (voir Limitation vérifiée ci-dessous).
 
 ## Mémoire de session
 
