@@ -123,3 +123,13 @@ est distinct de celui de `/livre` : déclenché par une instruction ponctuelle
 explicite (pas les phrases "tu peux commiter"/"... et merger"), limité à
 GitHub, jamais de Merge Request ni de GitLab. Sans cette exception, la règle
 absolue "aucun push sans phrase de `/livre`" bloquait ce cas d'usage.
+
+## 2026-07-27 — `chore/readme-utilisation` (pas d'issue formelle)
+
+Ajoute un `README.md` à la racine du dépôt : point d'entrée pratique et
+humain pour utiliser Gouvernail (prérequis, démarrage d'un nouveau projet
+via `/amorce-projet`, cycle de vie d'une tâche, table des 11 skills
+disponibles), complémentaire à `CLAUDE.md` qui reste la doctrine détaillée.
+Répond à un besoin identifié en conversation : jusqu'ici, comprendre comment
+utiliser le framework nécessitait de lire `CLAUDE.md` en entier (écrit comme
+instructions pour Claude, pas comme guide de démarrage).
