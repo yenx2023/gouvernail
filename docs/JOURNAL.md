@@ -87,3 +87,12 @@ Gestion des erreurs (fail fast, pas de fallback silencieux) et Dépendances
 (réutiliser l'existant avant d'ajouter une librairie). Axes proposés en
 réponse à une demande explicite d'amélioration "dans le même sens que
 SOLID", sélectionnés par l'utilisateur parmi plusieurs candidats.
+
+## 2026-07-27 — Issue #5 — `feature/5-livre-ferme-issue-milestone`
+
+`/livre` (mode "merge") ferme désormais automatiquement l'issue liée et,
+si c'était sa dernière issue ouverte, le milestone associé — le merge
+explicite est déjà la confirmation de livraison, plus besoin de la
+redemander séparément. `/cloture` devient l'outil des exceptions (hors
+flux de merge), sur invocation explicite. Issue #5 elle-même fermée en
+appliquant cette nouvelle doctrine dans la foulée.
