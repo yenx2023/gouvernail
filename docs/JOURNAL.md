@@ -97,6 +97,21 @@ redemander séparément. `/cloture` devient l'outil des exceptions (hors
 flux de merge), sur invocation explicite. Issue #5 elle-même fermée en
 appliquant cette nouvelle doctrine dans la foulée.
 
+## 2026-07-27 — `chore/fonctions-testables-gitlab-api` (pas d'issue formelle)
+
+Extrait la logique mécanique de `scripts/gitlab-api.sh` (parsing du numéro
+d'issue depuis le nom de branche, vérification qu'un milestone n'a plus
+d'issue ouverte, récupération du `sha` d'une Merge Request) en fonctions
+bash dédiées (`parse_issue_from_branch`, `milestone_is_empty`,
+`merge_request_sha`), plutôt que de laisser `/livre` redériver ce
+raisonnement en langage naturel à chaque exécution. Ajoute
+`tests/gitlab-api.test.sh` (16 tests hors-ligne, curl et sleep mockés) pour
+couvrir ce script au cœur de tous les skills — jusqu'ici seul le script
+applicatif des autres projets amorcés avait une doctrine de tests, pas
+Gouvernail lui-même. `/livre` et `/amorce-projet` mis à jour en
+conséquence (ce dernier reporte désormais `tests/` dans chaque nouveau
+projet).
+
 ## 2026-07-27 — `chore/push-continuite-local-cloud` (pas d'issue formelle)
 
 Formalise dans `CLAUDE.md` le "push de continuité" local ↔ Cloud : Claude
