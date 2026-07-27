@@ -69,3 +69,11 @@ explicite à chaque action mutante externe. Conçu à partir de l'inspection
 du précédent réel `todo-cli` (fichiers copiés, structure de `CLAUDE.md`,
 séquence git avec commit de genèse direct sur `main`). N'est jamais copié
 dans les nouveaux projets — outil méta propre à Gouvernail.
+
+## 2026-07-27 — `chore/solid-template-amorce-projet` (pas d'issue formelle)
+
+Ajoute une section "Principes de conception (SOLID)" au gabarit `CLAUDE.md`
+utilisé par `/amorce-projet` pour chaque nouveau projet, avec un garde-fou
+explicite contre l'abstraction prématurée (cohérence avec le reste de la
+doctrine anti-over-engineering). Ne s'applique qu'aux futurs projets amorcés
+— pas de rétro-application sur `todo-cli`.
