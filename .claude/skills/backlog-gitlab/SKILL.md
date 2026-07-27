@@ -43,13 +43,21 @@ n'a pas changé.
 
 ## Prérequis avant de lancer les étapes
 
-- Le projet GitLab cible (chemin, ex. `ai-agent-projects/mon-projet`) doit
-  déjà exister. S'il n'existe pas, le créer via
-  `gitlab_rest POST "projects" '{"name":"...","path":"...","namespace_id":<id_groupe>,"visibility":"private"}'`
-  (nécessite la permission `Project: Create`, catégorie "User permissions" du
-  token — voir CLAUDE.md > Sécurité du token). Si absent du contexte, demander
-  le chemin à l'utilisateur — jamais deviner ou réutiliser un projet d'une
-  session précédente sans confirmation.
+- Le projet GitLab cible se résout par défaut depuis
+  `.claude/gitlab-project.env` (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`) —
+  jamais redemandé à l'utilisateur si ce fichier existe et que son projet est
+  déjà créé sur GitLab (voir CLAUDE.md > Réutiliser ce framework pour un
+  nouveau projet). Deux cas où on sort de ce défaut :
+  - **Fichier absent** (premier amorçage d'un nouveau projet, avant que
+    `.claude/gitlab-project.env` ait été créé/adapté) : demander le chemin à
+    l'utilisateur — jamais deviner ou réutiliser un projet d'une session
+    précédente sans confirmation.
+  - **Projet référencé mais pas encore créé sur GitLab** (`gitlab_rest GET
+    "projects/<groupe>%2F<projet>"` échoue en 404) : le créer via
+    `gitlab_rest POST "projects" '{"name":"...","path":"...","namespace_id":<id_groupe>,"visibility":"private"}'`
+    (nécessite la permission `Project: Create`, catégorie "User permissions"
+    du token — voir CLAUDE.md > Sécurité du token), puis continuer avec ce
+    projet.
 - `GITLAB_TOKEN` doit être configuré (`.env` local ou variable d'environnement
   Cloud). Si `scripts/gitlab-api.sh` échoue avec "GITLAB_TOKEN absent",
   s'arrêter et demander à l'utilisateur de le configurer.
@@ -58,8 +66,13 @@ n'a pas changé.
 
 ## Étapes
 
-1. **Identifier le projet GitLab cible.** Si non fourni en argument ou pas
-   déductible du contexte, demander à l'utilisateur.
+1. **Identifier le projet GitLab cible.** Par défaut, `source
+   .claude/gitlab-project.env` et utiliser `GITLAB_PROJECT_PATH`/
+   `GITLAB_PROJECT_ID`. Si ce fichier est absent, demander le chemin à
+   l'utilisateur puis vérifier que le projet existe (le créer sinon, voir
+   Prérequis) — et rappeler à l'utilisateur de créer/adapter
+   `.claude/gitlab-project.env` à l'issue de cette étape pour que les skills
+   suivants (`/tache`, `/livre`) n'aient pas à redemander le projet.
 
 2. **Lire le PRD/PLAN**, extraire une structure Milestone → Issues (thèmes
    ou phases de haut niveau = Milestones candidats, tâches concrètes et

@@ -27,10 +27,16 @@ lien traçable entre le travail GitHub et le work item GitLab.
 - `GITLAB_TOKEN` configuré (`.env` local ou variable d'environnement Cloud).
   Si `scripts/gitlab-api.sh` échoue avec "GITLAB_TOKEN absent", s'arrêter et
   demander à l'utilisateur de le configurer.
-- Le projet GitLab cible (`--projet <groupe>/<projet>`) doit être fourni ou
-  déductible sans ambiguïté du contexte de la conversation. Sinon, demander
-  à l'utilisateur — jamais deviner ou réutiliser un projet d'une session
-  précédente sans confirmation.
+- Le projet GitLab cible se résout par défaut depuis
+  `.claude/gitlab-project.env` (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`) —
+  jamais redemandé à l'utilisateur si ce fichier existe (voir CLAUDE.md >
+  Réutiliser ce framework pour un nouveau projet). L'option `--projet
+  <groupe>/<projet>` reste disponible pour **surcharger** explicitement ce
+  défaut (ex. issue exceptionnellement portée par un autre projet) ; dans ce
+  cas, présenter la substitution à l'utilisateur pour confirmation avant de
+  continuer. Si `.claude/gitlab-project.env` est absent et qu'aucun
+  `--projet` n'est fourni, demander le chemin à l'utilisateur — jamais
+  deviner ou réutiliser un projet d'une session précédente sans confirmation.
 - L'arbre de travail git local doit être propre (`git status` sans
   modification en cours). S'il ne l'est pas, s'arrêter et demander à
   l'utilisateur de committer ou stasher avant de continuer — ne jamais
@@ -38,8 +44,13 @@ lien traçable entre le travail GitHub et le work item GitLab.
 
 ## Étapes
 
-1. **Identifier l'issue et le projet.** Résoudre l'`id` numérique du projet
-   GitLab (`gitlab_rest GET "projects/<groupe>%2F<projet>"`, champ `id`).
+1. **Identifier l'issue et le projet.** Par défaut, `source
+   .claude/gitlab-project.env` et utiliser `GITLAB_PROJECT_PATH`/
+   `GITLAB_PROJECT_ID` directement (pas d'appel API nécessaire pour résoudre
+   l'`id`, il est déjà dans le fichier). Si `--projet <groupe>/<projet>` a
+   été fourni explicitement (surcharge du défaut) ou si le fichier est
+   absent, résoudre l'`id` numérique via
+   `gitlab_rest GET "projects/<groupe>%2F<projet>"` (champ `id`).
 
 2. **Lire l'issue** via REST :
    ```
