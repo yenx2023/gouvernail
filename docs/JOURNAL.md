@@ -96,3 +96,15 @@ explicite est déjà la confirmation de livraison, plus besoin de la
 redemander séparément. `/cloture` devient l'outil des exceptions (hors
 flux de merge), sur invocation explicite. Issue #5 elle-même fermée en
 appliquant cette nouvelle doctrine dans la foulée.
+
+## 2026-07-27 — `chore/push-continuite-local-cloud` (pas d'issue formelle)
+
+Formalise dans `CLAUDE.md` le "push de continuité" local ↔ Cloud : Claude
+Code local et Claude Code Cloud sont deux environnements séparés qui ne
+partagent que le code (via GitHub), pas l'historique de conversation ni la
+mémoire auto — poursuivre une même tâche en changeant d'environnement exige
+donc de pousser la branche WIP sur GitHub avant la livraison finale. Ce push
+est distinct de celui de `/livre` : déclenché par une instruction ponctuelle
+explicite (pas les phrases "tu peux commiter"/"... et merger"), limité à
+GitHub, jamais de Merge Request ni de GitLab. Sans cette exception, la règle
+absolue "aucun push sans phrase de `/livre`" bloquait ce cas d'usage.
