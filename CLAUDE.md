@@ -42,6 +42,34 @@ fichier. Le token GitLab, lui, n'a pas besoin de changer d'un projet à
 l'autre : scopé au groupe, il fonctionne tel quel pour tout nouveau projet
 créé dans ce groupe (voir Sécurité du token GitLab).
 
+### Produit multi-dépôts
+
+Un même produit peut nécessiter plusieurs dépôts GitHub / projets GitLab
+distincts (ex. un backend et une app mobile qui partagent un même domaine
+fonctionnel). Dans ce cas :
+
+- Regrouper les projets GitLab sous un **sous-groupe dédié au produit**
+  (`ai-agent-projects/<produit>/<depot>`), via `/amorce-projet
+  --sous-groupe <produit>` — plutôt que le chemin plat
+  `ai-agent-projects/<depot>` utilisé pour un projet isolé. Le sous-groupe
+  est créé une seule fois, au premier dépôt amorcé pour ce produit ; les
+  suivants le réutilisent (le skill détecte s'il existe déjà).
+- Chaque dépôt garde son propre backlog GitLab, son propre `docs/PRD.md`/
+  `docs/PLAN.md`, sans mécanisme automatique de liaison entre eux : les
+  liens d'issue `relates_to` de GitLab sont scopés au même projet — pas de
+  dépendance croisée outillable entre projets sur ce tier.
+- Une dépendance fonctionnelle vers un autre dépôt du même produit (ex. une
+  user story mobile qui suppose un support backend) se documente
+  explicitement dans la section **Notes complémentaires** du PRD concerné,
+  par référence au chemin du dépôt frère (ex. « suppose un endpoint côté
+  `taga-backend`, voir `taga-backend/docs/PRD.md` ») — cette section est
+  déjà un catch-all pour les dépendances externes, pas besoin d'une
+  nouvelle section ni d'un nouvel outil.
+
+Retour d'expérience à l'origine de cette section : `taga-backend` et
+`taga-mobile-app`, deux dépôts d'un même produit (TAGA) regroupés sous
+`ai-agent-projects/taga/`.
+
 ### Skills de cadrage (claude-mastery)
 
 Les skills `interroge`, `cadre`, `planifie`, `design`, `investigue`,
