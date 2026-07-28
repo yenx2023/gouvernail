@@ -1,6 +1,6 @@
 ---
 name: amorce-projet
-description: Amorce un nouveau projet réutilisant le framework Gouvernail — crée le projet GitLab et le dépôt GitHub dédiés, copie l'outillage (skills, scripts, doctrine) vers un nouveau répertoire local. Usage : /amorce-projet <chemin-cible> [--nom <nom-projet>] [--description "..."]
+description: Amorce un nouveau projet réutilisant le framework Gouvernail — crée le projet GitLab et le dépôt GitHub dédiés, copie l'outillage (skills, scripts, doctrine) vers un nouveau répertoire local. Usage : /amorce-projet <chemin-cible> [--nom <nom-projet>] [--description "..."] [--sous-groupe <produit>]
 ---
 
 # amorce-projet
@@ -45,23 +45,44 @@ exception documentée à l'interdit de commit direct).
 1. **Résoudre le chemin cible** et en déduire un slug par défaut (dernier
    segment du chemin, ex. `../mon-projet` → `mon-projet`). **Présenter à
    l'utilisateur pour confirmation** avant toute action mutante :
-   - nom du dépôt GitHub (`<owner>/<slug>`),
-   - chemin du projet GitLab (`ai-agent-projects/<slug>`),
+   - nom du dépôt GitHub (`<owner>/<slug>`, toujours à plat — GitHub n'a
+     pas d'équivalent de sous-groupe pertinent ici),
+   - chemin du projet GitLab (`ai-agent-projects/<slug>`, ou
+     `ai-agent-projects/<sous-groupe>/<slug>` si `--sous-groupe <produit>`
+     est fourni — voir CLAUDE.md > Produit multi-dépôts pour quand
+     l'utiliser : plusieurs dépôts distincts formant un seul produit),
    - visibilité (privé par défaut sur les deux plateformes).
    Attendre la validation. Ajuster slug/nom si l'utilisateur le demande.
 
-2. **Résoudre l'id du groupe GitLab** `ai-agent-projects` (une seule fois,
+2. **Résoudre l'id du groupe/sous-groupe GitLab** cible (une seule fois,
    pas de cache entre invocations) :
-   ```
-   scripts/gitlab-api.sh graphql \
-     'query($fullPath: ID!) { namespace(fullPath: $fullPath) { id } }' \
-     '{"fullPath":"ai-agent-projects"}'
-   ```
+   - **Sans `--sous-groupe`** : résoudre l'id du groupe `ai-agent-projects` :
+     ```
+     scripts/gitlab-api.sh graphql \
+       'query($fullPath: ID!) { namespace(fullPath: $fullPath) { id } }' \
+       '{"fullPath":"ai-agent-projects"}'
+     ```
+   - **Avec `--sous-groupe <produit>`** : résoudre d'abord l'id de
+     `ai-agent-projects/<produit>` avec la même requête (`fullPath`
+     substitué). S'il existe déjà (produit dont un premier dépôt a déjà été
+     amorcé), réutiliser directement cet id. S'il n'existe pas (`namespace`
+     renvoyé `null`), résoudre l'id du groupe parent `ai-agent-projects`
+     (requête ci-dessus), **présenter la création du sous-groupe à
+     l'utilisateur pour confirmation** (action mutante externe, comme la
+     création de projet/dépôt), puis :
+     ```
+     scripts/gitlab-api.sh rest POST "groups" \
+       '{"name":"<produit>","path":"<produit>","parent_id":<id_groupe_parent>,"visibility":"private"}'
+     ```
+     Utiliser l'`id` renvoyé comme groupe cible pour l'étape suivante. Si la
+     création échoue (permissions insuffisantes, nom déjà pris), s'arrêter
+     et rapporter — ne jamais retomber silencieusement sur le chemin plat.
 
-3. **Créer le projet GitLab** :
+3. **Créer le projet GitLab**, sous le groupe ou sous-groupe résolu à
+   l'étape précédente :
    ```
    scripts/gitlab-api.sh rest POST "projects" \
-     '{"name":"<slug>","path":"<slug>","namespace_id":<id_groupe>,"visibility":"private"}'
+     '{"name":"<slug>","path":"<slug>","namespace_id":<id_groupe_ou_sous_groupe>,"visibility":"private"}'
    ```
    Conserver `id` et `path_with_namespace` de la réponse. Si la création
    échoue (nom déjà pris, permissions), s'arrêter et rapporter — ne jamais
@@ -77,9 +98,13 @@ exception documentée à l'interdit de commit direct).
           errors
         }
       }' \
-     '{"projectPath":"ai-agent-projects/<slug>","title":"Amorçage de l'\''outillage Gouvernail","description":"Copie de l'\''outillage réutilisable depuis le framework Gouvernail, via /amorce-projet."}'
+     '{"projectPath":"<path_with_namespace de l'\''étape 3>","title":"Amorçage de l'\''outillage Gouvernail","description":"Copie de l'\''outillage réutilisable depuis le framework Gouvernail, via /amorce-projet."}'
    ```
-   Vérifier `errors` ; si non vide, s'arrêter et rapporter.
+   `projectPath` = `path_with_namespace` renvoyé à l'étape 3 (ex.
+   `ai-agent-projects/<slug>`, ou `ai-agent-projects/<produit>/<slug>` avec
+   `--sous-groupe`) — jamais recomposé à la main, pour ne pas se déphaser du
+   chemin réellement créé. Vérifier `errors` ; si non vide, s'arrêter et
+   rapporter.
 
 5. **Préparer le répertoire cible** : `mkdir -p <chemin>` si absent, puis
    `git init` si ce n'est pas déjà un dépôt git (déjà vérifié absent de
@@ -116,7 +141,9 @@ exception documentée à l'interdit de commit direct).
    GITLAB_PROJECT_PATH=ai-agent-projects/<slug>
    GITLAB_PROJECT_ID=<id du projet créé à l'étape 3>
    ```
-   (chemin exact = `path_with_namespace` renvoyé à l'étape 3).
+   (chemin exact = `path_with_namespace` renvoyé à l'étape 3 — inclut le
+   sous-groupe, ex. `ai-agent-projects/<produit>/<slug>`, si `--sous-groupe`
+   a été utilisé).
 
 10. **Copier le token** : lire la valeur de `GITLAB_TOKEN` depuis le `.env`
     local de Gouvernail (lecture fichier, jamais via une commande qui
@@ -158,8 +185,9 @@ exception documentée à l'interdit de commit direct).
 
 - Écraser un répertoire cible déjà initialisé (déjà un `.git/` ou déjà
   amorcé) — s'arrêter dès le prérequis correspondant.
-- Créer le dépôt GitHub ou le projet GitLab sans confirmation explicite de
-  l'utilisateur sur le nom/slug et la visibilité.
+- Créer le dépôt GitHub, le projet GitLab ou le sous-groupe GitLab
+  (`--sous-groupe`) sans confirmation explicite de l'utilisateur sur le
+  nom/slug et la visibilité.
 - Committer directement sur `main` en dehors de ce commit de genèse unique
   — toute tâche suivante dans le nouveau projet passe par `/tache` + `/livre`.
 - Afficher le token GitLab en clair dans la conversation ou un log.
