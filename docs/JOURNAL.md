@@ -133,3 +133,17 @@ disponibles), complémentaire à `CLAUDE.md` qui reste la doctrine détaillée.
 Répond à un besoin identifié en conversation : jusqu'ici, comprendre comment
 utiliser le framework nécessitait de lire `CLAUDE.md` en entier (écrit comme
 instructions pour Claude, pas comme guide de démarrage).
+
+## 2026-07-28 — Issue #6 — `feature/6-produits-multi-depots`
+
+Retour d'expérience remonté depuis `taga-backend`/`taga-mobile-app` (deux
+dépôts d'un même produit TAGA, regroupés sous le sous-groupe GitLab
+`ai-agent-projects/taga/` — pattern non supporté jusqu'ici). Ajoute un
+paramètre `--sous-groupe <produit>` à `/amorce-projet` pour nicher un
+projet GitLab sous ce sous-groupe (créé si absent, réutilisé sinon) plutôt
+que le chemin plat `ai-agent-projects/<slug>` seul supporté auparavant.
+Documente dans `CLAUDE.md` le pattern "produit multi-dépôts" : quand créer
+ce sous-groupe, et la convention pour les dépendances cross-repo (référence
+explicite dans la section Notes complémentaires déjà existante du PRD,
+plutôt qu'un nouveau mécanisme — les liens `relates_to` de GitLab restent
+scopés au même projet). Livré via MR GitLab !27, mergée dans `main`.
