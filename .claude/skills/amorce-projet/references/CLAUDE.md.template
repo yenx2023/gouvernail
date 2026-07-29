@@ -110,6 +110,51 @@ qu'aux frontières du système (entrée utilisateur, API externe). Une erreur
 inattendue doit remonter clairement, jamais être avalée pour "que ça
 continue de tourner".
 
+## Stratégie de logging
+
+Les logs suivent le même esprit que la Gestion des erreurs ci-dessus — fail
+fast, pas de bruit :
+
+- **Niveaux de log fidèles à la sévérité réelle** — `error`/`warning` pour ce
+  qui casse ou dégrade un flux, `info` pour les événements métier
+  significatifs, `debug` pour le détail d'investigation. Ne pas logger en
+  `error` un comportement attendu (ex. validation utilisateur rejetée), ne
+  pas masquer une vraie erreur en `debug`.
+- **Catégorisation par canal/finalité** — séparer au minimum le technique
+  (debug applicatif, erreurs d'exécution) de l'audit (traçabilité d'une
+  action métier sensible : KYC, transaction, moyen de paiement) dès que
+  l'écosystème propose un mécanisme natif de canaux/channels. Deux finalités
+  différentes (diagnostic dev vs preuve de conformité), deux publics, donc
+  potentiellement deux durées de rétention — pas un flux unique
+  indifférencié.
+- **Volumétrie maîtrisée** — la verbosité `debug` reste désactivée par
+  défaut en production ; une rotation/rétention explicite (durée adaptée à
+  la finalité du canal, cf. Catégorisation) évite une croissance illimitée
+  du volume de logs. Un événement à haute fréquence (boucle, retry,
+  polling) se sample ou s'agrège plutôt que de produire une entrée par
+  occurrence.
+- **Structuré plutôt que texte libre** dès que l'écosystème le permet
+  nativement (champs clé/valeur, pas de concaténation de string) — condition
+  pour qu'un log reste exploitable en recherche/alerting, pas juste lu à
+  l'œil dans un fichier.
+- **Jamais de secret, token, mot de passe ou donnée personnelle identifiante
+  en clair dans un log** — règle absolue, pas une recommandation.
+  Particulièrement sensible sur tout projet manipulant KYC, moyens de
+  paiement ou identité. Masquer/tronquer plutôt que ne pas logger, quand le
+  contexte reste utile sans la donnée sensible.
+- **Un événement, un log** — logger au point où l'erreur est effectivement
+  gérée (la frontière, cf. Gestion des erreurs), pas à chaque niveau de la
+  pile d'appel qui la laisse remonter : un même incident ne doit pas
+  produire N entrées redondantes.
+- **Contexte exploitable, pas un identifiant de plus** — inclure ce qui
+  permet de recouper un incident (identifiant de requête/corrélation,
+  utilisateur ou entité concernée) en réutilisant une convention déjà
+  existante dans le framework utilisé plutôt qu'en en inventant une.
+- **Réutiliser le mécanisme de logging natif du framework/langage** avant
+  d'introduire une dépendance dédiée (cohérent avec Dépendances ci-dessous)
+  — une lib de logging externe se justifie par un besoin réel (agrégation
+  centralisée, format imposé par l'infra), pas par défaut.
+
 ## Dépendances
 
 Réutiliser l'existant (bibliothèque standard, code déjà présent dans le
