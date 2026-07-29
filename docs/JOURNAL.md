@@ -161,3 +161,17 @@ exploitable, réutilisation du mécanisme de logging natif avant dépendance
 dédiée. Reportée le même jour dans `taga-backend` et `taga-mobile-app`
 (voir leurs JOURNAL.md respectifs). Livré via MR GitLab !29, mergée dans
 `main`.
+
+## 2026-07-29 — Issue #8 — `chore/8-documentation-vivante`
+
+Formalise une doctrine anti-dérive documentaire suite à une investigation
+concrète : ajoute une section "Documentation vivante" au gabarit
+`CLAUDE.md.template` (README tenu à jour reflétant le setup réel plutôt
+qu'un boilerplate, notes de dépendance cross-repo révisées dès qu'elles
+sont résolues côté dépôt référencé, un état documenté à un seul endroit).
+Complète la section Produit multi-dépôts du CLAUDE.md de Gouvernail avec
+le retour d'expérience à l'origine de cette règle : une note obsolète dans
+`taga-mobile-app/docs/PRD.md` et `docs/PLAN.md` continuait d'affirmer
+qu'une dépendance backend (portefeuille conducteur, suivi temps réel)
+n'était pas couverte, alors qu'elle l'était depuis l'extension du PRD
+`taga-backend`. Livré via MR GitLab !31, mergée dans `main`.
