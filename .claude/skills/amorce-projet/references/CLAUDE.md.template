@@ -101,6 +101,22 @@ chaque ligne avant la Merge Request. Pas d'objectif de couverture globale
 arbitraire : du code existant non touché sans test n'est pas un blocage, un
 comportement changé sans test l'est.
 
+**Limite de vérification visuelle en session Cloud** — Claude Code Cloud
+(sandbox web sans écran ni émulateur/simulateur, restrictions réseau qui
+bloquent en général les tunnels de dev interactif type Expo/Metro) peut
+écrire du code, exécuter des tests automatisés (unitaires/composants, sans
+rendu réel) et ouvrir des Merge Requests, mais ne peut ni afficher un
+rendu visuel ni piloter une session de développement interactive (hot
+reload navigateur/appareil, émulateur Android, simulateur iOS). Pour tout
+projet à surface visuelle significative (frontend web, application
+mobile), documenter explicitement dans le `CLAUDE.md` du projet ce qui
+reste vérifiable en session Cloud (tests automatisés) et ce qui nécessite
+une session Claude Code locale ou une reprise manuelle par l'utilisateur
+(rendu visuel, tests end-to-end pilotés par un simulateur/émulateur/
+navigateur réel). Ne jamais prétendre à une vérification visuelle qui n'a
+pas eu lieu — l'annoncer explicitement comme non faite plutôt que de
+l'omettre.
+
 ## Documentation vivante
 
 Toute modification qui change un état déjà documenté — périmètre
