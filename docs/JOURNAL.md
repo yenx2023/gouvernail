@@ -175,3 +175,16 @@ le retour d'expérience à l'origine de cette règle : une note obsolète dans
 qu'une dépendance backend (portefeuille conducteur, suivi temps réel)
 n'était pas couverte, alors qu'elle l'était depuis l'extension du PRD
 `taga-backend`. Livré via MR GitLab !31, mergée dans `main`.
+
+## 2026-07-29 — Issue #9 — `fix/9-milestone-empty-parametre-invalide`
+
+Corrige `scripts/gitlab-api.sh` > `milestone_is_empty()` : interrogeait
+`GET /projects/:id/issues?milestone_id=<id>`, paramètre invalide côté API
+GitLab (HTTP 400 "milestone_id does not have a valid value"). L'endpoint
+attend `milestone=<titre>` — résout désormais le titre du milestone avant
+de filtrer les issues ouvertes. Bug découvert en conditions réelles le
+2026-07-29 sur `taga-backend` (clôture du milestone "Authentification &
+comptes"), vérifié corrigé sur un milestone vide et un milestone encore
+ouvert. Reporté dans les deux projets qui en ont une copie
+(`taga-backend`#58, `taga-mobile-app`#43). Livré via MR GitLab !33, mergée
+dans `main`.
