@@ -65,10 +65,24 @@ fonctionnel). Dans ce cas :
   `taga-backend`, voir `taga-backend/docs/PRD.md` ») — cette section est
   déjà un catch-all pour les dépendances externes, pas besoin d'une
   nouvelle section ni d'un nouvel outil.
+- **Cette note doit être révisée dès que la dépendance est couverte côté
+  dépôt référencé** — sinon elle continue d'affirmer un état qui n'est plus
+  vrai (voir Documentation vivante dans le `CLAUDE.md.template`, gabarit
+  copié dans chaque nouveau projet). Rien ne déclenche cette révision
+  automatiquement : sans check explicite, la note survit telle quelle même
+  après que le dépôt référencé a rattrapé son retard.
 
 Retour d'expérience à l'origine de cette section : `taga-backend` et
 `taga-mobile-app`, deux dépôts d'un même produit (TAGA) regroupés sous
-`ai-agent-projects/taga/`.
+`ai-agent-projects/taga/`. Retour d'expérience à l'origine de la règle de
+révision ci-dessus : la section Notes complémentaires de
+`taga-mobile-app/docs/PRD.md`, puis la section Bloquée par de la Phase 7 de
+son `docs/PLAN.md`, ont continué à affirmer que le portefeuille
+conducteur/suivi temps réel n'étaient "pas encore couverts" côté
+`taga-backend` — alors que `taga-backend/docs/PRD.md` (user stories 44-52)
+et `taga-backend/docs/PLAN.md` (Phases 5 et 8) les couvraient déjà depuis
+l'extension du PRD backend. Détecté a posteriori, sans qu'aucune étape du
+cycle de vie d'une tâche ne l'ait signalé.
 
 ### Skills de cadrage (claude-mastery)
 
