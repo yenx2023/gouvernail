@@ -168,10 +168,15 @@ parse_issue_from_branch() {
 
 # milestone_is_empty <project_id> <milestone_id>
 # Vrai (exit 0) si le milestone n'a plus aucune issue ouverte, faux (exit 1) sinon.
+# L'endpoint GET /projects/:id/issues n'accepte pas de filtre milestone_id :
+# il attend milestone=<titre> (le titre du milestone, pas son id numérique) —
+# on résout donc d'abord le titre avant de filtrer les issues ouvertes.
 milestone_is_empty() {
   local project_id="$1" milestone_id="$2"
-  local open_count
-  open_count="$(gitlab_rest GET "projects/${project_id}/issues?milestone_id=${milestone_id}&state=opened" | jq 'length')"
+  local milestone_title encoded_title open_count
+  milestone_title="$(gitlab_rest GET "projects/${project_id}/milestones/${milestone_id}" | jq -r '.title')"
+  encoded_title="$(jq -rn --arg v "$milestone_title" '$v|@uri')"
+  open_count="$(gitlab_rest GET "projects/${project_id}/issues?milestone=${encoded_title}&state=opened" | jq 'length')"
   [ "$open_count" -eq 0 ]
 }
 
