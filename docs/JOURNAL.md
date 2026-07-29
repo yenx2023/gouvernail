@@ -147,3 +147,17 @@ ce sous-groupe, et la convention pour les dépendances cross-repo (référence
 explicite dans la section Notes complémentaires déjà existante du PRD,
 plutôt qu'un nouveau mécanisme — les liens `relates_to` de GitLab restent
 scopés au même projet). Livré via MR GitLab !27, mergée dans `main`.
+
+## 2026-07-29 — Issue #7 — `chore/7-strategie-logging`
+
+Ajoute une section "Stratégie de logging" au gabarit
+`.claude/skills/amorce-projet/references/CLAUDE.md.template`, entre
+Gestion des erreurs et Dépendances : niveaux de log fidèles à la sévérité
+réelle, catégorisation par canal/finalité (technique vs audit dès que
+l'écosystème le permet), volumétrie maîtrisée (rotation/rétention, sampling
+des événements à haute fréquence), structuré plutôt que texte libre, jamais
+de secret/PII en clair, un événement = un log, contexte de corrélation
+exploitable, réutilisation du mécanisme de logging natif avant dépendance
+dédiée. Reportée le même jour dans `taga-backend` et `taga-mobile-app`
+(voir leurs JOURNAL.md respectifs). Livré via MR GitLab !29, mergée dans
+`main`.
