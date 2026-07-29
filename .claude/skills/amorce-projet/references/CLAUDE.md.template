@@ -101,6 +101,32 @@ chaque ligne avant la Merge Request. Pas d'objectif de couverture globale
 arbitraire : du code existant non touché sans test n'est pas un blocage, un
 comportement changé sans test l'est.
 
+## Documentation vivante
+
+Toute modification qui change un état déjà documenté — périmètre
+fonctionnel (PRD), décisions/découpage d'architecture (PLAN), dépendance
+cross-repo signalée dans un autre projet du même produit, instructions de
+mise en route (README ou équivalent), surface d'API exposée (voir
+Documentation API le cas échéant) — met à jour le document concerné dans la
+même livraison, pas dans une tâche séparée "à faire plus tard". Même
+logique que Tests ci-dessus : un état changé sans que sa documentation
+suive n'est pas considéré comme livré.
+
+- **README (ou équivalent) tenu à jour** — point d'entrée de mise en route :
+  reflète le setup réel (dépendances, commandes de démarrage, pointeurs
+  vers PRD/PLAN/CLAUDE.md), pas un template générique laissé tel quel après
+  le bootstrap initial.
+- **Notes de dépendance cross-repo résolues** — quand un PRD/PLAN signale
+  explicitement une dépendance non couverte par un autre dépôt du même
+  produit (voir Produit multi-dépôts dans le CLAUDE.md de Gouvernail), et
+  que cette dépendance devient couverte côté dépôt référencé, la note doit
+  être mise à jour ou retirée dans la foulée — jamais laissée affirmer un
+  état qui n'est plus vrai.
+- **Un état, un endroit** — éviter de dupliquer une même information dans
+  plusieurs documents (ex. une décision d'architecture décrite à la fois
+  dans PLAN.md et CLAUDE.md) : référencer plutôt que recopier, pour n'avoir
+  qu'un seul endroit à corriger en cas de changement.
+
 ## Gestion des erreurs
 
 Fail fast : pas de `try/catch` défensif pour un cas qui ne peut pas
