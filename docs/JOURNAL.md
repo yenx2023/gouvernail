@@ -188,3 +188,16 @@ comptes"), vérifié corrigé sur un milestone vide et un milestone encore
 ouvert. Reporté dans les deux projets qui en ont une copie
 (`taga-backend`#58, `taga-mobile-app`#43). Livré via MR GitLab !33, mergée
 dans `main`.
+
+## 2026-07-29 — Issue #10 — `chore/10-limite-verification-visuelle-cloud`
+
+Retour d'expérience `taga-mobile-app` : Claude Code Cloud (sandbox web
+utilisé pour ces sessions) n'a ni écran ni émulateur/simulateur, et ses
+restrictions réseau bloquent en général les tunnels de dev interactif
+(ex. tunnel Expo/Metro). Il peut écrire du code, exécuter des tests
+automatisés (sans rendu réel) et ouvrir des Merge Requests, mais jamais
+afficher un rendu visuel ni piloter une session interactive. Ajoute ce
+garde-fou à `CLAUDE.md.template` > Tests pour que tout nouveau projet à
+surface visuelle significative (frontend web, mobile) en hérite dès
+l'amorçage, plutôt que de le redécouvrir projet par projet. Livré via MR
+GitLab !35, mergée dans `main`.
