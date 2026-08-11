@@ -11,6 +11,15 @@ amorcé via son skill `/amorce-projet` — toute amélioration générique
 découverte ici devrait être reportée dans le framework, pas seulement
 corrigée localement.
 
+## Langue de travail
+
+Toute réponse de Claude Code dans une session sur ce dépôt — messages de
+conversation, commentaires, titres/descriptions de commits, Merge Requests,
+issues — est rédigée en français : l'utilisateur de ce projet communique
+exclusivement en français. Ne pas confondre avec une éventuelle exigence de
+langue sur le contenu applicatif lui-même (voir `docs/PRD.md` le cas
+échéant), indépendante de celle-ci.
+
 ## Doctrine (à ne jamais enfreindre)
 
 - **GitLab est la seule source de vérité projet** : backlog, epics, issues, jalons,

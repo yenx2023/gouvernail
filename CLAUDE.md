@@ -103,6 +103,13 @@ principe si claude-mastery publie un nouveau skill qui recoupe l'existant :
 est strictement plus complet** — décision de l'utilisateur, voir mémoire
 `feedback` associée.
 
+## Langue de travail
+
+Toute réponse de Claude Code dans une session sur ce dépôt — messages de
+conversation, commentaires, titres/descriptions de commits, Merge Requests,
+issues — est rédigée en français : l'utilisateur de ce framework communique
+exclusivement en français.
+
 ## Doctrine (à ne jamais enfreindre)
 
 - **GitLab est la seule source de vérité projet** : backlog, epics, issues, jalons,
