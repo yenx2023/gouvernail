@@ -201,3 +201,14 @@ garde-fou à `CLAUDE.md.template` > Tests pour que tout nouveau projet à
 surface visuelle significative (frontend web, mobile) en hérite dès
 l'amorçage, plutôt que de le redécouvrir projet par projet. Livré via MR
 GitLab !35, mergée dans `main`.
+
+## 2026-08-11 — Issue #11 — chore/11-langue-travail-claude
+
+Ajoute une section "Langue de travail" au `CLAUDE.md` de Gouvernail et au
+gabarit `CLAUDE.md.template` (`/amorce-projet`) : aucun des deux ne
+précisait explicitement la langue de réponse de Claude Code (distincte
+d'une éventuelle exigence de langue sur le contenu applicatif), obligeant
+l'utilisateur à le rappeler à chaque nouvelle session — y compris sur les
+projets amorcés depuis ce framework. Retour d'expérience remonté depuis
+`taga-backend` et `taga-mobile-app`, corrigés de la même façon. Livré via
+MR GitLab !37, mergée dans `main`.
