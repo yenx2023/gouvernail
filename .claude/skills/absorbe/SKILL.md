@@ -99,17 +99,55 @@ des conflits résolus et comment.
 
 ## PHASE 3 : Réapplication
 
-Pour chaque entrée de `docs/REGISTRE.md` qui n'a pas généré de conflit Git
-(mergée automatiquement, donc pas vérifiée en Phase 2) :
+**`docs/REGISTRE.md` n'est pas une garantie d'exhaustivité.** Il ne
+documente que les divergences explicitement consignées au fil des tâches
+précédentes. Si la Phase 2 a résolu des conflits en prenant largement
+`--theirs` (ou toute résolution qui privilégie systématiquement l'amont),
+des personnalisations qui vivaient dans des fichiers **non conflictuels**
+peuvent avoir été silencieusement écrasées par le merge automatique — Git
+ne signale rien puisqu'il n'y a pas eu de conflit à trancher. Sur une
+absorption réelle, l'écart entre le nombre de fichiers réellement
+personnalisés et le nombre d'entrées du registre peut être d'un ordre de
+grandeur (dizaines de fichiers vs plusieurs centaines) : piloter la
+réapplication par le seul registre laisse alors un angle mort large.
 
-1. Vérifier qu'elle est toujours présente et fonctionnelle dans le code
-   après merge.
-2. Pour une correction de bug documentée : vérifier si l'amont l'a corrigée
-   nativement dans cette version (`git diff upstream-vOLD..upstream-vNEW --
-   <fichier concerné>`) — si oui, comparer les deux corrections pour
-   compatibilité avant de choisir laquelle garder ; si non, s'assurer que
-   la nôtre a survécu au merge.
-3. Consulter le skill produit dédié du projet pour les pièges connus liés à
+1. **Audit différentiel complet, en plus du passage par le registre** :
+   `git diff --name-only upstream-vOLD..pre-update-vNEW -- <chemins source
+   du produit>` donne la liste exhaustive des fichiers avec une
+   divergence réelle par rapport à l'amont précédent. Comparer cette liste
+   au nombre d'entrées du registre — si l'écart est important, prévenir
+   l'utilisateur avant de continuer et proposer un audit par lots
+   thématiques (par domaine fonctionnel) plutôt qu'une réapplication
+   pilotée uniquement par les entrées connues.
+2. **Méthode de vérification recommandée ("diff vérité-terrain")**, plus
+   fiable que `git apply --3way` (qui construit sa propre résolution
+   ours/theirs sans le contexte des vrais commits) : pour chaque fichier,
+   comparer trois références —
+   - `git diff -w upstream-vOLD..pre-update-vNEW -- <fichier>` : notre
+     delta réel avant l'absorption (le `-w`, ignore whitespace, est
+     important — une bonne partie des "deltas" apparents ne sont que du
+     bruit de fin de ligne ou de reformatage) ;
+   - `git diff -w upstream-vOLD..upstream-vNEW -- <fichier>` : delta amont
+     — l'amont a pu corriger nativement le même problème, à comparer avant
+     de réappliquer aveuglément par-dessus ;
+   - `git diff -w upstream-vNEW..HEAD -- <fichier>` (ou `pre-update-vNEW`)
+     : ce qui manque réellement dans l'état actuel.
+   Ne réappliquer que la logique fonctionnelle réellement perdue, jamais
+   écraser une refonte native de l'amont sans l'avoir comparée.
+3. Pour chaque entrée de `docs/REGISTRE.md` : vérifier qu'elle est
+   toujours présente et fonctionnelle dans le code après merge, avec la
+   méthode ci-dessus. Pour une correction de bug documentée, si l'amont
+   l'a corrigée nativement, comparer les deux corrections pour
+   compatibilité avant de choisir laquelle garder.
+4. **Avant de réappliquer un delta décrit comme manquant** (que ce soit
+   par une entrée du registre ou par une tâche déléguée), vérifier
+   `git log --oneline --all -- <fichier>` et lire les messages de commit —
+   un correctif ultérieur a pu retirer délibérément une partie d'un
+   correctif antérieur (parce qu'il causait un autre problème), ou la
+   documentation elle-même peut être en décalage avec le code réel
+   historique. Ne jamais faire confiance à une description sans vérifier
+   contre l'historique git.
+5. Consulter le skill produit dédié du projet pour les pièges connus liés à
    cette version ou ce type de changement (voir sa base de pièges).
 
 **Arrête-toi, attends validation avant la Phase 4.**
@@ -128,10 +166,24 @@ Tests > limite de vérification visuelle en session Cloud, si applicable).
 
 1. Pour chaque divergence touchée pendant cette absorption (réappliquée,
    modifiée, ou confirmée obsolète parce qu'absorbée nativement) : mettre à
-   jour `docs/REGISTRE.md` via le skill `/registre`.
+   jour `docs/REGISTRE.md` via le skill `/registre`. Si l'audit de la Phase
+   3 a fait remonter beaucoup de divergences jamais documentées jusque-là,
+   ne pas ouvrir mécaniquement une issue par divergence trouvée — regrouper
+   par famille sous une entrée unique (ex. rattachée à l'issue de
+   l'absorption elle-même) est plus lisible qu'une dizaine d'entrées
+   quasi-identiques ; demander à l'utilisateur en cas de doute sur le bon
+   grain.
 2. Pour chaque piège rencontré pendant cette absorption : le capitaliser
    via le skill `/piege`.
-3. Suivre le cycle de vie normal de la tâche (CLAUDE.md > Cycle de vie
+3. **Vérifier que le numéro de version du projet (fichier de manifeste :
+   `pubspec.yaml`, `package.json`, `build.gradle`, etc., selon
+   l'écosystème) reflète bien la nouvelle base amont**, selon la convention
+   du projet (voir CLAUDE.md du projet — généralement `X.Y` dérivé de la
+   version amont). Un import qui remplace le fichier de manifeste en Phase
+   1/2 peut faire régresser ce numéro vers la valeur par défaut de l'amont,
+   ou simplement l'oublier — cette régression ne casse ni le build ni les
+   tests, donc rien d'autre ne la détecte.
+4. Suivre le cycle de vie normal de la tâche (CLAUDE.md > Cycle de vie
    d'une tâche) : `/livre` sur la phrase de validation explicite de
    l'utilisateur.
 
@@ -147,4 +199,8 @@ Tests > limite de vérification visuelle en session Cloud, si applicable).
 - Considérer une divergence comme obsolète/absorbée sans une vérification
   explicite (diff amont) confirmant qu'elle est effectivement couverte
   nativement.
+- Considérer la Phase 3 terminée sur la seule base des entrées de
+  `docs/REGISTRE.md` quand la Phase 2 a résolu des conflits en `--theirs`
+  à grande échelle, sans un audit différentiel complet (voir Phase 3.1) —
+  le registre n'est pas une garantie d'exhaustivité.
 - Sauter la Phase 4 (tests) même sous pression de temps.

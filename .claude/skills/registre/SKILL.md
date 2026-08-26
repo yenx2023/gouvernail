@@ -36,6 +36,22 @@ nécessaire (vérifié le <date>) | absorbée nativement en <upstream-vX.Y>,
 divergence obsolète
 ```
 
+## Cas particulier : beaucoup de divergences trouvées en une seule fois
+
+Un audit (ex. `/absorbe` Phase 3 sur un merge résolu en `--theirs` à grande
+échelle) peut faire remonter d'un coup des dizaines de divergences jamais
+documentées jusque-là. N'ouvre pas mécaniquement une issue GitLab et une
+entrée par divergence trouvée dans ce cas — ça produit un registre illisible
+pour un bénéfice de traçabilité marginal (elles ont toutes la même origine :
+cet audit). Regrouper par famille fonctionnelle sous une entrée unique
+(rattachée à l'issue qui a motivé l'audit, ex. l'issue d'absorption
+elle-même) reste largement plus utile : une section par famille listant les
+fichiers concernés et l'intention, comme pour une entrée normale mais avec
+plusieurs sous-points. Ouvrir une issue séparée reste justifié pour une
+divergence isolément significative (ex. une régression de sécurité), pas
+pour chaque fichier d'un même audit. En cas de doute sur le bon grain,
+demander à l'utilisateur plutôt que trancher seul.
+
 ## Étapes
 
 1. **Lire l'issue** liée : `gitlab_rest GET
