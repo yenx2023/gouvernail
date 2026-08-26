@@ -212,3 +212,18 @@ l'utilisateur à le rappeler à chaque nouvelle session — y compris sur les
 projets amorcés depuis ce framework. Retour d'expérience remonté depuis
 `taga-backend` et `taga-mobile-app`, corrigés de la même façon. Livré via
 MR GitLab !37, mergée dans `main`.
+
+## 2026-08-26 — chore/outils-externes-diagram-design (pas d'issue formelle)
+
+Ajoute une section "Outils externes recommandés (plugins, non vendorisés)"
+à `CLAUDE.md` (et son pendant dans `README.md`) : contrairement aux skills
+vendorisés (`interroge`/`cadre`/.../`illustre`, copiés dans
+`.claude/skills/`), certains outils tiers utiles au framework se
+distribuent comme plugins Claude Code via marketplace — mode de
+distribution incompatible avec le vendoring, donc jamais installés
+automatiquement par `/amorce-projet`. Documente `diagram-design`
+(`cathrynlavery/diagram-design`, MIT) : diagrammes techniques (architecture,
+ER, séquence, UML...) en HTML+SVG autonome, en complément — jamais en
+remplacement — de Mermaid (documents versionnés, diffable en MR) et
+`/illustre` (visuels pédagogiques Excalidraw). Livré via MR GitLab !38,
+mergée dans `main`.
