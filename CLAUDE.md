@@ -103,6 +103,41 @@ principe si claude-mastery publie un nouveau skill qui recoupe l'existant :
 est strictement plus complet** — décision de l'utilisateur, voir mémoire
 `feedback` associée.
 
+### Outils externes recommandés (plugins, non vendorisés)
+
+Contrairement aux skills ci-dessus, certains outils tiers utiles au
+framework sont distribués comme **plugins Claude Code via marketplace**
+(mise à jour vivante côté éditeur tiers) plutôt que comme un dossier de
+skill à copier. Ce mode de distribution est incompatible avec le principe
+de vendoring ci-dessus — installer un plugin, c'est prendre une dépendance
+externe qui vit hors du contrôle du framework, pas l'adopter dans
+`.claude/skills/`. En conséquence :
+
+- **`/amorce-projet` ne les installe jamais automatiquement** — ni dans
+  Gouvernail, ni dans un nouveau projet amorcé. Chaque projet décide s'il
+  en a l'usage et les installe lui-même, à la demande.
+- Le choix d'un outil externe suit la même exigence que Dépendances
+  (`CLAUDE.md.template`) : maintenance active vérifiée avant adoption, pas
+  d'ajout par confort.
+
+**`diagram-design`** ([`cathrynlavery/diagram-design`](https://github.com/cathrynlavery/diagram-design),
+MIT) — plugin générant des diagrammes techniques (architecture, ER,
+séquence, Gantt, UML, dependency graph...) en HTML+SVG autonome. Utile pour
+les diagrammes qui accompagnent `docs/PLAN.md`/`docs/PRD.md`, en
+complément — jamais en remplacement — de `/illustre` et de Mermaid :
+
+| Besoin | Outil | Pourquoi |
+|---|---|---|
+| Diagramme intégré à un document versionné (`PLAN.md`, `PRD.md`, README, description d'issue GitLab) | **Mermaid** (bloc de code natif) | Texte diffable en Merge Request, rendu nativement par GitLab, zéro installation. C'est le choix par défaut. |
+| Visuel pédagogique/conceptuel (schéma pour cours, article, slide, vidéo) | **`/illustre`** (Excalidraw) | Déjà vendorisé, style libre/à main levée adapté à la vulgarisation. |
+| Livrable technique autonome et soigné, hors document versionné (schéma joint à une issue, support de présentation, export pour un stakeholder) | **`diagram-design`** | Rendu plus riche (39 types, thème de marque) qu'un bloc Mermaid, mais produit un fichier HTML/SVG illisible en diff — à ne jamais utiliser pour un diagramme qui doit rester revuable en MR. |
+
+Installation (à la demande, par projet, jamais committée dans ce dépôt) :
+```
+/plugin marketplace add cathrynlavery/diagram-design
+/plugin install diagram-design@diagram-design
+```
+
 ## Langue de travail
 
 Toute réponse de Claude Code dans une session sur ce dépôt — messages de

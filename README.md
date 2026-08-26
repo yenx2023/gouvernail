@@ -90,6 +90,16 @@ Les six premiers (`interroge` à `illustre`) sont vendorisés depuis
 [`claude-mastery`](https://github.com/naiersaidane/claude-mastery) (MIT) ;
 les cinq suivants sont propres à Gouvernail.
 
+## Outils externes recommandés (à installer à la demande)
+
+Contrairement au tableau ci-dessus, ces outils sont des **plugins Claude
+Code** (marketplace tierce) et ne sont jamais copiés par `/amorce-projet` —
+chaque projet les installe lui-même s'il en a l'usage.
+
+| Outil | Rôle | Quand l'utiliser plutôt que Mermaid/`/illustre` |
+|---|---|---|
+| [`diagram-design`](https://github.com/cathrynlavery/diagram-design) | Diagrammes techniques (architecture, ER, séquence, UML...) en HTML+SVG autonome | Livrable soigné hors document versionné (issue, présentation) — jamais pour un diagramme qui doit rester diffable dans une Merge Request, voir `CLAUDE.md` > *Outils externes recommandés*. |
+
 ## Limitation connue
 
 Le groupe GitLab est en tier **Free** : pas d'Epics (Premium/Ultimate requis)
