@@ -86,12 +86,18 @@ lien traçable entre le travail GitHub et le work item GitLab.
    déjà obtenue à cette étape couvre aussi le nom de branche final.
 
 6. **Vérifier l'état du dépôt local** : `git status` doit être propre.
-   S'assurer d'être sur la branche principale (`main`) et à jour avec
-   `origin/main` (`git fetch origin && git status`) ; si la branche locale
-   est en retard, proposer un `git pull` avant de continuer plutôt que de
-   créer la branche sur une base obsolète.
+   **Déterminer la branche de base** : `git ls-remote --heads origin
+   staging` — si elle existe, ce projet est en régime déployé (voir
+   `CLAUDE.md` > Stratégie Git ou skill `amorce-projet` > régime déployé) et
+   `staging` est le sas d'intégration permanent où se mergent les branches
+   de tâche ; sinon, `main` est la base (régime distribué, ou projet
+   `conception` sans branche d'intégration séparée). S'assurer d'être sur
+   cette branche de base et à jour avec son upstream (`git fetch origin &&
+   git status`) ; si la branche locale est en retard, proposer un `git pull`
+   avant de continuer plutôt que de créer la branche sur une base obsolète.
 
-7. **Créer la branche localement** : `git checkout -b <type>/<numero>-<slug>`.
+7. **Créer la branche localement** depuis la branche de base déterminée à
+   l'étape 6 : `git checkout -b <type>/<numero>-<slug>`.
    Ne pas pousser (`git push`) — la branche reste locale tant que
    l'utilisateur n'a pas donné la phrase de validation explicite (voir skill
    `/livre` et CLAUDE.md > Cycle de vie d'une tâche).
