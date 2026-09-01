@@ -128,6 +128,49 @@ et `taga-backend/docs/PLAN.md` (Phases 5 et 8) les couvraient déjà depuis
 l'extension du PRD backend. Détecté a posteriori, sans qu'aucune étape du
 cycle de vie d'une tâche ne l'ait signalé.
 
+### Adopter Gouvernail sur un dépôt existant
+
+`/amorce-projet` refuse délibérément de tourner sur un chemin cible qui a
+déjà un `.git/` (voir son garde-fou anti-écrasement) — il n'est prévu que
+pour un nouveau dépôt vide. Adopter l'outillage Gouvernail sur un projet
+**déjà existant** (cas fréquent en profil `produit-tiers` : le code tourne
+déjà en production depuis longtemps quand la décision d'outiller avec
+Gouvernail est prise) n'est donc **pas couvert par un skill dédié** — ça se
+fait à la main, en copiant l'outillage adapté au profil depuis
+`.claude/skills/amorce-projet/SKILL.md` (la logique de copie y est
+documentée même si le skill lui-même refuse de s'exécuter sur ce cas) ou
+depuis un dépôt frère du même produit déjà outillé.
+
+**Ce que cette copie manuelle rate le plus souvent : les décisions que
+`/amorce-projet` force explicitement pour un projet neuf ne sont plus
+posées.** Une session qui adopte Gouvernail sur un dépôt existant en
+copiant un `CLAUDE.md` frère hérite silencieusement de SES choix — y
+compris ceux qui ne s'appliquent pas au nouveau contexte. Avant de
+considérer une adoption manuelle terminée, reposer explicitement les mêmes
+questions qu'`/amorce-projet` poserait pour un projet neuf (voir Étape 1 de
+`.claude/skills/amorce-projet/SKILL.md`) :
+
+- profil (`conception`/`produit-tiers`),
+- **si `produit-tiers` : régime (`deploye`/`distribue`) — ne jamais le
+  copier tel quel d'un dépôt frère.** Reposer la question pour CE dépôt
+  précis à partir de sa nature réelle (composant à environnements gérés vs
+  composant distribué en versions, voir Profils ci-dessus), pas de ce que
+  le dépôt frère utilise,
+- sous-groupe produit s'il y a plusieurs dépôts pour le même produit tiers
+  (voir Produit multi-dépôts ci-dessus).
+
+Retour d'expérience à l'origine de cette section : sur un produit à trois
+dépôts (un backend + deux apps mobiles), le backend a adopté Gouvernail en
+régime `déployé` — correct, il a de vrais environnements test/production.
+Les deux apps mobiles ont ensuite adopté Gouvernail en copiant le
+`CLAUDE.md` du backend, régime `déployé` inclus — alors que la doc Profils
+cite explicitement une app mobile comme cas canonique du régime
+`distribué`. L'écart a été noté dans le `CLAUDE.md` de chacune ("pas encore
+basculé sur distribue... tâche dédiée") mais rien n'a jamais déclenché cette
+tâche — la note a survécu telle quelle sur les deux dépôts jusqu'à ce que
+l'utilisateur la relève, plusieurs semaines et une absorption de version
+majeure plus tard.
+
 ### Skills de cadrage (claude-mastery)
 
 Concerne uniquement le socle commun et le profil `conception` — les skills
