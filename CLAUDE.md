@@ -19,28 +19,65 @@ ci-dessus.
 
 ### Réutiliser ce framework pour un nouveau projet
 
-Chaque nouveau projet (cahier des charges → application livrée) a sa **propre
-paire** dépôt GitHub + projet GitLab, distincte de celles de `Gouvernail`.
-GitHub n'existe que parce que Claude Code Cloud l'impose (voir Doctrine
-ci-dessous) — GitLab reste la seule source de vérité, y compris pour ce
-nouveau projet.
+Chaque nouveau projet a son **propre** projet GitLab, distinct de celui de
+`Gouvernail` — GitLab reste la seule source de vérité, y compris pour ce
+nouveau projet. Un dépôt GitHub dédié s'y ajoute **si le projet utilise
+Claude Code Cloud** (voir Doctrine ci-dessous — obligatoire pour le profil
+`conception`, optionnel pour `produit-tiers`, voir Profils ci-dessous).
 
-Amorçage semi-automatisé via le skill `/amorce-projet <chemin-cible>`,
-lancé depuis une session Claude Code ouverte sur **ce dépôt** (Gouvernail) :
-crée le projet GitLab et le dépôt GitHub dédiés, copie l'outillage vers le
-nouveau répertoire — chaque action mutante externe (création de projet,
-création de dépôt, push) reste **validée par l'utilisateur à chaque
-étape**, ce skill élimine la répétition mécanique, pas la validation
+Amorçage semi-automatisé via le skill `/amorce-projet <chemin-cible>
+--profil <conception|produit-tiers> [...]`, lancé depuis une session Claude
+Code ouverte sur **ce dépôt** (Gouvernail) : crée le projet GitLab (et le
+dépôt GitHub le cas échéant), copie l'outillage adapté au profil choisi
+vers le nouveau répertoire — chaque action mutante externe (création de
+projet, création de dépôt, push) reste **validée par l'utilisateur à
+chaque étape**, ce skill élimine la répétition mécanique, pas la validation
 humaine. `/amorce-projet` lui-même n'est **jamais** copié dans les nouveaux
 projets — c'est un outil méta propre à Gouvernail.
 
 Ce qui change d'un projet à l'autre, concrètement, c'est le contenu de
 `.claude/gitlab-project.env` (`GITLAB_PROJECT_PATH`/`GITLAB_PROJECT_ID`) —
-`scripts/gitlab-api.sh` et les skills (`/backlog-gitlab`, `/tache`, `/livre`,
-`/cloture`) ne codent jamais un projet en dur, ils lisent toujours ce
+`scripts/gitlab-api.sh` et les skills du socle commun (`/backlog-gitlab`,
+`/tache`, `/livre`, `/cloture`, et les autres skills partagés quel que soit
+le profil) ne codent jamais un projet en dur, ils lisent toujours ce
 fichier. Le token GitLab, lui, n'a pas besoin de changer d'un projet à
 l'autre : scopé au groupe, il fonctionne tel quel pour tout nouveau projet
 créé dans ce groupe (voir Sécurité du token GitLab).
+
+### Profils
+
+Deux profils déterminent quel outillage `/amorce-projet` copie et quel
+`CLAUDE.md` il génère — le détail mécanique complet (skills copiés par
+profil, templates, substitutions) vit dans
+`.claude/skills/amorce-projet/SKILL.md`, cette section n'en donne que le
+principe :
+
+- **`conception`** (défaut historique de ce framework, cas TAGA/todo-cli) —
+  le produit est conçu ici : cahier des charges → application livrée. Le
+  cadrage passe par `/cadre` → `docs/PRD.md`, puis `/planifie` →
+  `docs/PLAN.md`. GitHub est systématique (façade Claude Code Cloud).
+- **`produit-tiers`** — le produit existe déjà chez un fournisseur externe
+  (ex. un produit CodeCanyon), ce projet le personnalise et absorbe ses
+  mises à jour au fil du temps sans perdre les personnalisations ni les
+  corrections de bugs déjà appliquées. Pas de cadrage produit (`/cadre`/
+  `/planifie` n'ont pas de sens ici — la conception n'est pas la nôtre) :
+  le document pivot est `docs/REGISTRE.md`, alimenté par les skills
+  `/absorbe` (montée de version, en phases validées comme `/investigue`),
+  `/registre` (consigner une divergence) et `/piege` (capitaliser un piège
+  d'absorption). GitHub est **optionnel** — GitLab seul par défaut
+  (`--github` pour l'ajouter si Claude Code Cloud devient utile plus tard).
+  Un axe supplémentaire, `--regime deploye|distribue`, distingue un
+  composant déployé en continu sur une infra contrôlée (environnements +
+  stratégie de déploiement, ex. un backend) d'un composant distribué en
+  versions (stores/packages, pas d'environnement à gérer, ex. une app
+  mobile) — voir Produit multi-dépôts ci-dessous, c'est typiquement le même
+  produit qui a besoin des deux régimes selon le dépôt.
+
+Ce qui est spécifique au produit tiers personnalisé (architecture, pièges,
+procédures de build) n'est **jamais** copié depuis Gouvernail ni reporté
+dedans — ça vit dans un skill produit dédié propre à chaque projet
+`produit-tiers` (ex. `<produit>-update`), en dehors du framework. Seule la
+discipline du processus (`/absorbe`, `/registre`, `/piege`) est partagée.
 
 ### Produit multi-dépôts
 
@@ -54,6 +91,13 @@ fonctionnel). Dans ce cas :
   `ai-agent-projects/<depot>` utilisé pour un projet isolé. Le sous-groupe
   est créé une seule fois, au premier dépôt amorcé pour ce produit ; les
   suivants le réutilisent (le skill détecte s'il existe déjà).
+- **Chaque dépôt du produit choisit son propre régime** en profil
+  `produit-tiers` (voir Profils ci-dessus) : le cas fréquent est un backend
+  en `--regime deploye` et une ou plusieurs apps mobiles du même produit en
+  `--regime distribue` — même produit, même sous-groupe, workflows Git
+  différents parce que les contraintes opérationnelles diffèrent
+  réellement (haute disponibilité côté serveur vs releases versionnées
+  côté store).
 - Chaque dépôt garde son propre backlog GitLab, son propre `docs/PRD.md`/
   `docs/PLAN.md`, sans mécanisme automatique de liaison entre eux : les
   liens d'issue `relates_to` de GitLab sont scopés au même projet — pas de
@@ -84,7 +128,54 @@ et `taga-backend/docs/PLAN.md` (Phases 5 et 8) les couvraient déjà depuis
 l'extension du PRD backend. Détecté a posteriori, sans qu'aucune étape du
 cycle de vie d'une tâche ne l'ait signalé.
 
+### Adopter Gouvernail sur un dépôt existant
+
+`/amorce-projet` refuse délibérément de tourner sur un chemin cible qui a
+déjà un `.git/` (voir son garde-fou anti-écrasement) — il n'est prévu que
+pour un nouveau dépôt vide. Adopter l'outillage Gouvernail sur un projet
+**déjà existant** (cas fréquent en profil `produit-tiers` : le code tourne
+déjà en production depuis longtemps quand la décision d'outiller avec
+Gouvernail est prise) n'est donc **pas couvert par un skill dédié** — ça se
+fait à la main, en copiant l'outillage adapté au profil depuis
+`.claude/skills/amorce-projet/SKILL.md` (la logique de copie y est
+documentée même si le skill lui-même refuse de s'exécuter sur ce cas) ou
+depuis un dépôt frère du même produit déjà outillé.
+
+**Ce que cette copie manuelle rate le plus souvent : les décisions que
+`/amorce-projet` force explicitement pour un projet neuf ne sont plus
+posées.** Une session qui adopte Gouvernail sur un dépôt existant en
+copiant un `CLAUDE.md` frère hérite silencieusement de SES choix — y
+compris ceux qui ne s'appliquent pas au nouveau contexte. Avant de
+considérer une adoption manuelle terminée, reposer explicitement les mêmes
+questions qu'`/amorce-projet` poserait pour un projet neuf (voir Étape 1 de
+`.claude/skills/amorce-projet/SKILL.md`) :
+
+- profil (`conception`/`produit-tiers`),
+- **si `produit-tiers` : régime (`deploye`/`distribue`) — ne jamais le
+  copier tel quel d'un dépôt frère.** Reposer la question pour CE dépôt
+  précis à partir de sa nature réelle (composant à environnements gérés vs
+  composant distribué en versions, voir Profils ci-dessus), pas de ce que
+  le dépôt frère utilise,
+- sous-groupe produit s'il y a plusieurs dépôts pour le même produit tiers
+  (voir Produit multi-dépôts ci-dessus).
+
+Retour d'expérience à l'origine de cette section : sur un produit à trois
+dépôts (un backend + deux apps mobiles), le backend a adopté Gouvernail en
+régime `déployé` — correct, il a de vrais environnements test/production.
+Les deux apps mobiles ont ensuite adopté Gouvernail en copiant le
+`CLAUDE.md` du backend, régime `déployé` inclus — alors que la doc Profils
+cite explicitement une app mobile comme cas canonique du régime
+`distribué`. L'écart a été noté dans le `CLAUDE.md` de chacune ("pas encore
+basculé sur distribue... tâche dédiée") mais rien n'a jamais déclenché cette
+tâche — la note a survécu telle quelle sur les deux dépôts jusqu'à ce que
+l'utilisateur la relève, plusieurs semaines et une absorption de version
+majeure plus tard.
+
 ### Skills de cadrage (claude-mastery)
+
+Concerne uniquement le socle commun et le profil `conception` — les skills
+`absorbe`/`registre`/`piege` du profil `produit-tiers` sont natifs à
+Gouvernail, pas vendorisés (voir Profils ci-dessus).
 
 Les skills `interroge`, `cadre`, `planifie`, `design`, `investigue`,
 `illustre` sont vendorisés depuis

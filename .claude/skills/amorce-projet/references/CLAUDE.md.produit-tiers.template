@@ -1,0 +1,221 @@
+# CLAUDE.md — Conventions du projet
+
+## À propos de ce projet
+
+`{{PROJET_NOM}}` : {{PROJET_DESCRIPTION}}
+
+Ce composant n'est pas conçu ici — c'est une personnalisation de
+**{{PRODUIT_NOM}}** ({{PRODUIT_URL}}), un produit tiers dont on absorbe les
+mises à jour au fil du temps sans perdre nos personnalisations ni nos
+corrections de bugs. Voir « Produit tiers & registre de divergence »
+ci-dessous pour le principe, et le skill produit dédié de ce projet
+(généralement `<produit>-update`, à créer/adapter au premier amorçage — non
+fourni par Gouvernail, spécifique à ce produit) pour le détail opérationnel
+(architecture, commandes, pièges connus).
+
+L'outillage générique ci-dessous (`scripts/gitlab-api.sh`, skills
+`/backlog-gitlab`/`/tache`/`/livre`/`/cloture`/`/absorbe`/`/registre`/`/piege`,
+doctrine) est une copie de celui du framework
+[**Gouvernail**](https://github.com/yenx2023/gouvernail), profil
+`produit-tiers`, amorcé via son skill `/amorce-projet --profil
+produit-tiers` — toute amélioration générique découverte ici devrait être
+reportée dans le framework, pas seulement corrigée localement. Ce qui est
+spécifique à {{PRODUIT_NOM}} (pièges, guides d'architecture, procédures de
+build) n'est en revanche jamais reporté dans Gouvernail — ça vit uniquement
+dans ce projet et ses dépôts frères du même produit.
+
+## Langue de travail
+
+Toute réponse de Claude Code dans une session sur ce dépôt — messages de
+conversation, commentaires, titres/descriptions de commits, Merge Requests,
+issues — est rédigée en français : l'utilisateur de ce projet communique
+exclusivement en français. Ne pas confondre avec une éventuelle exigence de
+langue sur le contenu applicatif lui-même, indépendante de celle-ci.
+
+## Doctrine (à ne jamais enfreindre)
+
+- **GitLab est la seule source de vérité projet** : backlog, issues,
+  décision de merge. C'est là que tout se décide — voir Accès ci-dessous
+  pour le détail selon que ce projet utilise aussi GitHub ou non.
+- **Le produit tiers n'est jamais modifié par principe** : toute
+  personnalisation ou correction locale est délibérée, documentée dans
+  `docs/REGISTRE.md`, et reste ré-applicable après une montée de version —
+  voir « Produit tiers & registre de divergence ».
+
+### Vocabulaire : work items
+
+Depuis ses versions récentes, GitLab unifie Epics, Issues, Tasks, Incidents,
+etc. sous un modèle de données commun appelé **work item** — c'est ce que
+manipule l'API GraphQL Work Items utilisée par `scripts/gitlab-api.sh` et le
+skill `/backlog-gitlab` (`workItemCreate`, `workItemTypes`, `hierarchyWidget`
+pour les relations parent/enfant). Un Epic est un work item de type "Epic",
+une Issue un work item de type "Issue", etc. Les **Milestones** restent en
+dehors de ce modèle — c'est un concept GitLab séparé, toujours géré en REST
+classique (`/milestones`).
+
+### Limitation héritée : pas d'Epics sur ce projet (tier Free)
+
+Les **Epics nécessitent un abonnement GitLab Premium ou Ultimate**. Si le
+groupe GitLab de ce projet est en tier Free, **le backlog utilise les
+Milestones comme mécanisme de regroupement** à la place des Epics
+(thème/phase → Issues rattachées via `milestone_id`). Seul le type de lien
+`relates_to` fonctionne entre issues sur ce tier (`blocks`/`is_blocked_by`
+renvoient une erreur). Si le tier change, reconsidérer.
+
+{{ACCES_SECTION}}
+
+### Sécurité du token GitLab
+
+Voir le `CLAUDE.md` de Gouvernail > Sécurité du token GitLab pour le détail
+des permissions et de la doctrine de stockage (jamais en clair, `.env`
+local + variable d'environnement Cloud personnelle si Claude Code Cloud est
+utilisé, jamais de secret GitHub Actions).
+
+## Produit tiers & registre de divergence
+
+Ce projet personnalise **{{PRODUIT_NOM}}** plutôt que de le concevoir.
+Cinq principes gouvernent tout travail ici :
+
+1. **Aucune mise à jour amont n'est identique à la précédente** — toujours
+   analyser le changelog et la diff avant d'agir (voir skill `/absorbe`).
+2. **Personnalisations sacrées** — ne jamais écraser une personnalisation
+   sans l'avoir d'abord retrouvée dans `docs/REGISTRE.md` et comprise.
+3. **Bugs corrigés = acquis** — une correction locale documentée doit
+   survivre à chaque montée de version tant qu'elle n'est pas absorbée
+   nativement par l'amont.
+4. **`docs/REGISTRE.md` documente systématiquement** chaque divergence
+   (personnalisation, correctif préservé, contournement) — une entrée par
+   divergence, référencée par numéro d'issue GitLab plutôt que dupliquée
+   (voir skill `/registre`, et `CLAUDE.md.template` > Documentation
+   vivante > Un état, un endroit).
+5. **L'expérience s'accumule** — tout piège rencontré en absorbant une
+   version est capitalisé dans le skill produit dédié de ce projet (voir
+   skill `/piege`), jamais perdu dans l'historique d'une conversation.
+
+`docs/REGISTRE.md` est le document pivot de ce projet — l'équivalent d'un
+`docs/PRD.md` pour un projet en profil `conception`, sauf qu'il ne décrit
+pas ce que le produit doit faire (déjà décidé par le fournisseur tiers),
+mais **en quoi notre version s'écarte de la sienne, et pourquoi**. Toujours
+le lire avant toute tâche qui touche du code déjà personnalisé.
+
+{{REGIME_GIT_SECTION}}
+
+## Convention de nommage des branches
+
+- Format : `<type>/<numero-issue-gitlab>-<slug-court>`
+- Types : `feature`, `fix`, `chore`
+- Exemple : `chore/12-absorbe-v2-5`
+- Le numéro d'issue GitLab est **obligatoire** dans le nom de branche : c'est
+  le seul lien traçable entre le travail (GitHub le cas échéant, sinon
+  directement GitLab) et le work item GitLab.
+
+## Cycle de vie d'une tâche
+
+1. L'issue existe sur GitLab (créée via `/backlog-gitlab`, manuellement, ou
+   par la Phase 0 du skill `/absorbe` pour une montée de version).
+2. Créer la branche locale selon la convention ci-dessus (skill `/tache`).
+3. Développer, committer localement au fil de l'eau si besoin — mais tout
+   push et toute Merge Request restent conditionnés à une validation
+   humaine explicite, voir ci-dessous.
+4. **Le gate n'est pas un fichier, c'est une phrase explicite de
+   l'utilisateur dans la conversation** (skill `/livre`) :
+   - **"tu peux commiter"** → commit (si nécessaire) + push + ouverture
+     d'une Merge Request GitLab. Pas de merge.
+   - **"tu peux commiter et merger"** → tout ce qui précède, **plus** le
+     merge de la Merge Request et un commentaire sur l'issue liée.
+5. **La review réelle a lieu sur la Merge Request GitLab** — lecture du
+   diff, approbation, merge : c'est le vrai point de décision humaine.
+6. Avant de fermer l'issue (skill `/cloture`, ou fermeture automatique par
+   `/livre` mode "merge") : si la tâche a introduit ou modifié une
+   divergence par rapport à l'amont, consigner/mettre à jour l'entrée
+   correspondante dans `docs/REGISTRE.md` via le skill `/registre` — dans
+   la même livraison, pas après coup (voir Documentation vivante).
+7. Fermer l'issue GitLab reste une action **distincte et délibérée**,
+   jamais automatique en dehors du merge explicite (skill `/cloture
+   <numero-issue>`).
+
+## Principes de conception (SOLID + DRY)
+
+Le code applicatif de ce projet suit les principes **SOLID** dès qu'une
+modélisation orientée objet ou modulaire est en jeu — voir le
+`CLAUDE.md.template` de Gouvernail pour le détail de chaque lettre. Ça ne
+justifie pas l'abstraction prématurée : trois lignes similaires valent
+mieux qu'une abstraction anticipée, en particulier dans du code personnalisé
+qui doit rester facile à repérer face à l'amont — une personnalisation trop
+abstraite/factorisée devient difficile à isoler lors d'un diff upstream.
+
+## Tests
+
+Toute personnalisation, correction, ou absorption de mise à jour est
+couverte par au moins une vérification avant tout push — automatisée
+quand c'est possible, sinon une checklist manuelle explicite (voir skill
+`/absorbe` Phase 4 et le skill produit dédié de ce projet pour le détail).
+Ne jamais prétendre à une vérification qui n'a pas eu lieu.
+
+## Documentation vivante
+
+Toute modification qui change un état déjà documenté — divergence par
+rapport à l'amont (`docs/REGISTRE.md`), piège connu (skill produit dédié),
+dépendance cross-repo signalée dans un autre projet du même produit,
+instructions de mise en route (README) — met à jour le document concerné
+dans la même livraison, pas dans une tâche séparée "à faire plus tard".
+
+- **README tenu à jour** — reflète le setup réel.
+- **`docs/REGISTRE.md` à jour à chaque divergence** — statut face à la
+  dernière version amont absorbée, jamais laissé affirmer un état qui n'est
+  plus vrai après une absorption.
+- **Notes de dépendance cross-repo résolues** — voir le `CLAUDE.md` de
+  Gouvernail > Produit multi-dépôts.
+- **Un état, un endroit** — `docs/REGISTRE.md` référence les issues GitLab
+  par numéro, ne recopie jamais leur trace de décision ; les issues GitLab
+  ne recopient jamais le détail technique durable, elles y renvoient.
+
+## Gestion des erreurs
+
+Fail fast : pas de `try/catch` défensif pour un cas qui ne peut pas
+arriver, pas de fallback silencieux qui masque un bug, pas de validation
+dupliquée quand le langage/framework garantit déjà l'invariant. Ne valider
+qu'aux frontières du système (entrée utilisateur, API externe).
+
+## Stratégie de logging
+
+Voir le `CLAUDE.md.template` de Gouvernail pour le détail complet
+(niveaux fidèles à la sévérité, catégorisation technique/audit, volumétrie
+maîtrisée, structuré, jamais de secret en clair, un événement un log,
+contexte exploitable, mécanisme natif avant dépendance externe) — principes
+identiques quel que soit le profil.
+
+## Dépendances
+
+Réutiliser l'existant (bibliothèque standard, code déjà présent dans le
+projet **ou dans le produit amont**) avant d'ajouter une nouvelle
+dépendance absente de l'amont — une dépendance ajoutée localement complique
+chaque future absorption de version (conflit potentiel avec ce que l'amont
+ajoute de son côté). Vérifier au minimum qu'elle est activement maintenue.
+
+## Mémoire de session
+
+- `docs/JOURNAL.md` : journal chronologique des tâches livrées, une entrée
+  par clôture (date, numéro d'issue GitLab, branche, résumé). Toujours le
+  lire en début de session.
+- `docs/REGISTRE.md` : état courant des divergences par rapport à l'amont —
+  toujours le lire avant toute tâche touchant du code personnalisé, et
+  systématiquement avant une absorption de version (`/absorbe`).
+
+## Ce que Claude ne doit jamais faire seul
+
+- Committer directement sur `main` (toujours via une branche + Merge
+  Request).
+- Pousser une branche ou ouvrir une Merge Request sans la phrase de
+  validation explicite ("tu peux commiter" / "tu peux commiter et merger").
+- Merger une Merge Request sans le "... et merger" explicite.
+- Fermer une issue sans confirmation que le travail est réellement livré.
+- Modifier les règles de protection de branche ou les permissions
+  GitLab/GitHub.
+- **Remplacer un fichier hors du périmètre déclaré d'une absorption de
+  version** (voir skill `/absorbe`) — en particulier secrets, clés API,
+  fichiers de signature, configuration d'environnement : toujours vérifier
+  qu'ils sont exclus avant tout remplacement de code amont.
+- **Écraser une entrée de `docs/REGISTRE.md` sans avoir vérifié** si la
+  divergence qu'elle documente a été absorbée nativement par l'amont ou
+  doit être réappliquée.

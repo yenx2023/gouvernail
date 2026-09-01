@@ -20,8 +20,8 @@ explicite de l'utilisateur dans la conversation, ou l'invocation `/livre`.
   merge.
 - **Mode "merge"** — déclenché par *"tu peux commiter et merger"* (ou
   `/livre merge`) : tout ce qui précède, **plus** le merge de la Merge
-  Request, la resynchronisation de `main` GitHub, et un commentaire sur
-  l'issue GitLab liée.
+  Request, la resynchronisation de la branche de base sur GitHub, et un
+  commentaire sur l'issue GitLab liée.
 
 Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
 — ne jamais merger sans le "... et merger" explicite.
@@ -35,7 +35,16 @@ Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
   demander à l'utilisateur de le configurer.
 - Être sur une branche de travail nommée selon la convention
   `<type>/<numero-issue>-<slug>` (créée par le skill `/tache`) — **jamais sur
-  `main`**. Si la branche courante est `main`, s'arrêter : rien à livrer.
+  la branche de base**. Si la branche courante est `main` ou `staging`,
+  s'arrêter : rien à livrer.
+- **Déterminer la branche de base** (même logique que `/tache`) :
+  `git ls-remote --heads origin staging` — si elle existe, c'est la branche
+  de base (régime déployé, `staging` est le sas d'intégration où se mergent
+  les branches de tâche, voir CLAUDE.md > Stratégie Git ou skill
+  `amorce-projet` > régime déployé) ; sinon, `main` (régime distribué, ou
+  projet sans branche d'intégration séparée). Toutes les étapes ci-dessous
+  qui mentionnent `main` comme cible de merge ou de resynchronisation
+  utilisent en réalité cette branche de base résolue ici.
 - Le numéro d'issue est extrait du nom de branche via
   `scripts/gitlab-api.sh parse-issue <branche>` — jamais par une lecture
   manuelle du nom, pour ne pas confondre le numéro d'issue avec un nombre
@@ -51,8 +60,8 @@ Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
 
 ## Étapes — Mode "revue"
 
-1. Vérifier qu'on n'est pas sur `main` (`git branch --show-current`). Sinon,
-   s'arrêter et expliquer pourquoi.
+1. Vérifier qu'on n'est pas sur la branche de base (`git branch
+   --show-current`). Sinon, s'arrêter et expliquer pourquoi.
 2. S'il y a des changements en attente (`git status --short`), `git add` +
    `git commit` avec un message clair décrivant le changement. S'il n'y a
    rien à committer mais des commits locaux non poussés, continuer sans
@@ -65,11 +74,17 @@ Si la phrase de l'utilisateur est ambiguë sur le mode, demander avant d'agir
    ouvrir la Merge Request :
    ```
    scripts/gitlab-api.sh rest POST "projects/${GITLAB_PROJECT_ID}/merge_requests" \
-     '{"source_branch":"<branche>","target_branch":"main","title":"<titre>","description":"Closes #<numero>"}'
+     '{"source_branch":"<branche>","target_branch":"<branche de base résolue au Prérequis>","title":"<titre>","description":"Closes #<numero>"}'
    ```
    Si une MR existe déjà pour cette branche (erreur "already exists"), la
    retrouver (`GET .../merge_requests?source_branch=<branche>`) plutôt que
-   d'échouer.
+   d'échouer. Si elle existe mais cible la mauvaise branche (ex. créée avant
+   que la branche de base ait été correctement déterminée), corriger avant
+   de continuer :
+   ```
+   scripts/gitlab-api.sh rest PUT "projects/${GITLAB_PROJECT_ID}/merge_requests/<iid>" \
+     '{"target_branch":"<branche de base résolue>"}'
+   ```
 6. Rapporter l'URL de la MR à l'utilisateur (`web_url` de la réponse). Fin —
    ne jamais merger à ce stade.
 
@@ -91,12 +106,15 @@ ouverte existe déjà pour la branche), puis :
    ```
    Si le merge échoue (conflits, pipeline requis, etc.), s'arrêter et
    rapporter l'erreur — ne jamais forcer.
-8. Resynchroniser `main` GitHub **sans toucher à la branche locale
-   courante** :
+8. Resynchroniser la branche de base sur GitHub (si une continuité GitHub
+   existe pour ce projet — voir CLAUDE.md > Réutiliser ce framework) **sans
+   toucher à la branche locale courante** :
    ```
-   scripts/gitlab-api.sh fetch main
-   git push origin FETCH_HEAD:main
+   scripts/gitlab-api.sh fetch <branche de base résolue>
+   git push origin FETCH_HEAD:<branche de base résolue>
    ```
+   Si le projet n'a pas de remote GitHub (GitLab seul, voir profil
+   `produit-tiers` sans `--github`), sauter cette étape entièrement.
 9. Commenter puis **fermer** l'issue GitLab liée — le merge explicite
    ("tu peux commiter et merger") **est** la confirmation de livraison, la
    fermeture n'a plus besoin d'être redemandée séparément :
@@ -121,9 +139,9 @@ ouverte existe déjà pour la branche), puis :
 11. Ajouter une entrée dans `docs/JOURNAL.md` (créer le fichier avec un
     titre "# Journal" s'il n'existe pas) : date du jour, numéro d'issue,
     nom de branche, résumé en une phrase du travail livré.
-12. Récapituler à l'utilisateur : MR mergée (URL), `main` GitHub
-    synchronisé, issue fermée (+ milestone fermé si c'était le cas),
-    `docs/JOURNAL.md` mis à jour.
+12. Récapituler à l'utilisateur : MR mergée (URL), branche de base
+    resynchronisée sur GitHub (le cas échéant), issue fermée (+ milestone
+    fermé si c'était le cas), `docs/JOURNAL.md` mis à jour.
 
 Pour fermer une issue **en dehors** de ce flux (décidée comme non
 pertinente, doublon, ou rattrapage d'une clôture manquée) : skill
@@ -138,7 +156,8 @@ merge.
 - Merger une Merge Request sans le "... et merger" explicite — même si le
   mode "revue" vient d'être exécuté avec succès, ne pas enchaîner sur le
   merge sans nouvelle confirmation.
-- Committer directement sur `main`.
+- Committer directement sur la branche de base (`main`, ou `staging` en
+  régime déployé).
 - Fermer une issue autre que celle de la branche en cours de merge, ou un
   milestone qui a encore des issues ouvertes.
 - Forcer un merge en cas de conflit ou d'échec (`--force`, résolution
