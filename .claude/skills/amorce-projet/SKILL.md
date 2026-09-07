@@ -148,7 +148,12 @@ divergent trop pour deviner.
      `.claude/skills/tache/`, `.claude/skills/livre/`,
      `.claude/skills/cloture/`, `.claude/skills/interroge/`,
      `.claude/skills/investigue/`, `.claude/skills/illustre/`,
-     `.claude/skills/design/`, `.claude/skills/LICENSE-claude-mastery`.
+     `.claude/skills/design/`, `.claude/skills/eprouve/`,
+     `.claude/skills/LICENSE-claude-mastery`. `/eprouve` (validation E2E
+     Maestro, voir `CLAUDE.md.template` > Tests) n'a d'usage réel que sur
+     un projet à surface visuelle/interactive (mobile, frontend web) mais
+     reste copié sans condition, comme `/design`/`/illustre` — il ne sera
+     simplement jamais invoqué sur un projet qui n'en a pas l'usage.
    - **Si profil `conception`** : ajouter `.claude/skills/cadre/`,
      `.claude/skills/planifie/`.
    - **Si profil `produit-tiers`** : ajouter `.claude/skills/absorbe/`,
