@@ -227,3 +227,17 @@ ER, séquence, UML...) en HTML+SVG autonome, en complément — jamais en
 remplacement — de Mermaid (documents versionnés, diffable en MR) et
 `/illustre` (visuels pédagogiques Excalidraw). Livré via MR GitLab !38,
 mergée dans `main`.
+
+## 2026-09-08 — Issue #13 — branche `claude/taga-mobile-test-automation-p2gugz`
+
+Ajoute le skill `/eprouve` : formalise Maestro comme preuve factuelle de
+bon fonctionnement d'un parcours utilisateur au fil du développement (pas
+seulement en diagnostic a posteriori d'un bug rapporté), au même titre que
+les tests Jest/PHPUnit déjà couverts par la doctrine Tests. Distingue
+explicitement l'écriture d'un flow (possible en session Cloud) de son
+exécution réelle (nécessite Maestro CLI + device/émulateur, donc une
+session locale). Reporté dans `amorce-projet` (socle commun) et dans
+`CLAUDE.md.template` (doctrine Tests étendue). Branche imposée par la
+session Claude Code Cloud, hors convention `<type>/<numero>-<slug>` — le
+numéro d'issue est référencé via la description de la Merge Request
+plutôt que le nom de branche. Livré via MR GitLab !40, mergée dans `main`.
