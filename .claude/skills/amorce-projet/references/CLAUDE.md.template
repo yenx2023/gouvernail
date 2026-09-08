@@ -126,6 +126,20 @@ navigateur réel). Ne jamais prétendre à une vérification visuelle qui n'a
 pas eu lieu — l'annoncer explicitement comme non faite plutôt que de
 l'omettre.
 
+**Preuve factuelle via Maestro (`/eprouve`)** — sur un projet à surface
+visuelle/interactive réelle, un test unitaire/composant ne suffit pas à
+couvrir la doctrine Tests ci-dessus pour un comportement qui se joue à
+l'écran (navigation, formulaire, retour visuel) : seul un parcours
+end-to-end rejoué sur l'application réelle (Maestro) en apporte la preuve
+factuelle. Le skill `/eprouve` formalise cet usage : un parcours
+utilisateur nouveau ou modifié doit avoir son flow Maestro correspondant
+écrit **et exécuté avec succès** avant d'être considéré terminé — au même
+titre qu'un test automatisé vert, pas seulement en réaction à un bug déjà
+signalé. Cette exécution réelle ne peut avoir lieu qu'en session Claude
+Code locale (voir paragraphe ci-dessus) : en session Cloud, `/eprouve`
+écrit ou met à jour le flow mais le marque explicitement non exécuté, à
+valider lors d'une reprise locale.
+
 ## Documentation vivante
 
 Toute modification qui change un état déjà documenté — périmètre
