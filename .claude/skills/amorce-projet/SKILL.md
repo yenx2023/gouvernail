@@ -189,16 +189,8 @@ divergent trop pour deviner.
    Journal chronologique des tâches livrées (une entrée par clôture réelle —
    voir CLAUDE.md > Mémoire de session).
    ```
-   **Si profil `produit-tiers`**, créer en plus `docs/REGISTRE.md` :
-   ```
-   # Registre de divergence
-
-   Chaque divergence de ce projet par rapport à {{PRODUIT_NOM}} (personnalisation,
-   correctif préservé, contournement) — une entrée par divergence, référencée
-   par numéro d'issue GitLab. Alimenté par le skill /registre. Voir CLAUDE.md
-   > Produit tiers & registre de divergence.
-   ```
-   **Si profil `conception`**, créer en plus `docs/CONTEXT.md` :
+   **Créer aussi `docs/CONTEXT.md`**, quel que soit le profil (voir
+   CLAUDE.md > Mémoire de session) :
    ```
    # Contexte
 
@@ -225,6 +217,25 @@ divergent trop pour deviner.
    ## Décisions en attente
 
    Aucune à ce jour.
+   ```
+   **Si profil `produit-tiers`**, insérer une ligne supplémentaire sous le
+   titre `## Pièges opérationnels connus` ci-dessus, avant "Aucun à ce
+   jour." :
+   ```
+   Pièges liés à l'absorption d'une version amont → skill `/piege`, pas ici.
+   ```
+   — pour garder explicite la frontière avec `docs/REGISTRE.md`/`/piege`
+   (voir CLAUDE.md > Produit tiers & registre de divergence), plutôt que de
+   compter sur la mémoire de la session qui remplit ce fichier plus tard.
+
+   **Si profil `produit-tiers`**, créer en plus `docs/REGISTRE.md` :
+   ```
+   # Registre de divergence
+
+   Chaque divergence de ce projet par rapport à {{PRODUIT_NOM}} (personnalisation,
+   correctif préservé, contournement) — une entrée par divergence, référencée
+   par numéro d'issue GitLab. Alimenté par le skill /registre. Voir CLAUDE.md
+   > Produit tiers & registre de divergence.
    ```
 
 9. **Créer `.claude/gitlab-project.env`** dans la cible :
