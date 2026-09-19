@@ -3,6 +3,19 @@
 Journal chronologique des tâches livrées (une entrée par clôture réelle —
 voir CLAUDE.md > Mémoire de session).
 
+## 2026-09-19 — Issue #14 — `chore/14-memoire-vivante-contexte`
+
+Remonte le patron `docs/CONTEXT.md` (résumé vivant, édité en place, de
+l'état opérationnel courant) validé sur `taga-backend`#95/
+`taga-mobile-app`#90, profil `conception` uniquement : puce dans
+`CLAUDE.md.template` > Mémoire de session (lue avant `docs/JOURNAL.md`),
+étape de maintenance dans le skill `/livre` (mode merge, conditionnée à
+l'existence du fichier — socle commun, sans effet en `produit-tiers`),
+création du fichier vide à l'amorçage dans `amorce-projet` (symétrique à
+`docs/REGISTRE.md` côté `produit-tiers`). Vérifié sans chevauchement avec
+`docs/REGISTRE.md`/skill `/piege` avant cette remontée. Livré via MR
+GitLab !41, mergée dans `main`.
+
 ## 2026-07-26 — Issue #1 — `chore/1-gitlab-flow-mr`
 
 Remplacement du gate `.claude/validated` (fichier marqueur, mauvaise
