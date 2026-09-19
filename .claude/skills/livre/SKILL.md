@@ -139,9 +139,22 @@ ouverte existe déjà pour la branche), puis :
 11. Ajouter une entrée dans `docs/JOURNAL.md` (créer le fichier avec un
     titre "# Journal" s'il n'existe pas) : date du jour, numéro d'issue,
     nom de branche, résumé en une phrase du travail livré.
-12. Récapituler à l'utilisateur : MR mergée (URL), branche de base
+12. **Si `docs/CONTEXT.md` existe** (profil `conception` uniquement — voir
+    CLAUDE.md > Profils ; absent par construction en `produit-tiers`, qui a
+    son propre document pivot `docs/REGISTRE.md`) et que cette livraison
+    change l'état courant du projet ou révèle un piège opérationnel, le
+    mettre à jour en conséquence : édition ciblée de la section concernée
+    (`Où on en est`, `Pièges opérationnels connus`, `Décisions en
+    attente`), jamais une réécriture complète du fichier. Pas systématique
+    — seulement si la livraison apporte réellement quelque chose de
+    nouveau à ce niveau (une entrée `docs/JOURNAL.md` ne suffit pas à elle
+    seule à déclencher cette étape). Respecter la discipline de taille
+    déjà indiquée en tête du fichier (pas d'accumulation illimitée de
+    pièges).
+13. Récapituler à l'utilisateur : MR mergée (URL), branche de base
     resynchronisée sur GitHub (le cas échéant), issue fermée (+ milestone
-    fermé si c'était le cas), `docs/JOURNAL.md` mis à jour.
+    fermé si c'était le cas), `docs/JOURNAL.md` mis à jour (+
+    `docs/CONTEXT.md` si touché).
 
 Pour fermer une issue **en dehors** de ce flux (décidée comme non
 pertinente, doublon, ou rattrapage d'une clôture manquée) : skill

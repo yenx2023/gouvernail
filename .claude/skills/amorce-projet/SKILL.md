@@ -198,6 +198,34 @@ divergent trop pour deviner.
    par numéro d'issue GitLab. Alimenté par le skill /registre. Voir CLAUDE.md
    > Produit tiers & registre de divergence.
    ```
+   **Si profil `conception`**, créer en plus `docs/CONTEXT.md` :
+   ```
+   # Contexte
+
+   Résumé vivant de l'état opérationnel courant — édité en place, pas
+   chronologique (voir CLAUDE.md > Mémoire de session). Complète
+   docs/JOURNAL.md (historique, append-only) et docs/PLAN.md (décisions
+   d'architecture) sans les dupliquer : ce fichier reste court, et renvoie
+   vers eux plutôt que de recopier.
+
+   Mis à jour lors de chaque livraison (/livre, mode merge) si la tâche
+   change l'état courant ou révèle un piège opérationnel — édition ciblée,
+   jamais une réécriture complète. Discipline de taille : pas plus d'une
+   poignée de pièges actifs à la fois ; un piège résolu ou devenu non
+   pertinent se retire plutôt que de s'accumuler.
+
+   ## Où on en est
+
+   Projet tout juste amorcé, rien à résumer pour l'instant.
+
+   ## Pièges opérationnels connus
+
+   Aucun à ce jour.
+
+   ## Décisions en attente
+
+   Aucune à ce jour.
+   ```
 
 9. **Créer `.claude/gitlab-project.env`** dans la cible :
    ```
