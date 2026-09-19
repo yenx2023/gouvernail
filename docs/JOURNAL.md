@@ -3,6 +3,19 @@
 Journal chronologique des tâches livrées (une entrée par clôture réelle —
 voir CLAUDE.md > Mémoire de session).
 
+## 2026-09-19 — Issue #15 — `chore/15-context-produit-tiers`
+
+Étend `docs/CONTEXT.md` (issue #14) au profil `produit-tiers` : le
+fichier se crée désormais quel que soit le profil dans `amorce-projet`.
+Son rôle (état courant + pièges généraux + décisions en attente) est
+orthogonal à `docs/REGISTRE.md` (divergences de code par rapport à
+l'amont) et à la base de pièges du skill `/piege` (pièges spécifiques à
+l'absorption d'une version) — vérifié avant l'extension, pas supposé.
+Frontière rendue explicite à deux endroits (le fichier généré lui-même
+pour ce profil, et l'étape correspondante du skill `/livre`) plutôt que
+de compter sur la mémoire de la session qui le remplira plus tard. Livré
+via MR GitLab !42, mergée dans `main`.
+
 ## 2026-09-19 — Issue #14 — `chore/14-memoire-vivante-contexte`
 
 Remonte le patron `docs/CONTEXT.md` (résumé vivant, édité en place, de
