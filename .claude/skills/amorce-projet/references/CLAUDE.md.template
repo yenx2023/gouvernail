@@ -262,6 +262,13 @@ minimal : ce biais est à contrer explicitement.
 
 ## Mémoire de session
 
+- `docs/CONTEXT.md` : résumé vivant et édité en place (pas chronologique)
+  de l'état opérationnel courant — priorités en cours, pièges connus,
+  décisions en attente. **Toujours le lire en premier en début de
+  session**, avant `docs/JOURNAL.md` — c'est le résumé rapide, le journal
+  reste la référence si besoin de creuser une date ou une tâche précise.
+  Maintenu via une étape du skill `/livre` (mode merge), pas un fichier à
+  mettre à jour manuellement en dehors de ce flux.
 - `docs/JOURNAL.md` : journal chronologique des tâches livrées, une entrée par
   clôture (date, numéro d'issue GitLab, branche, résumé). Toujours le lire en
   début de session pour retrouver le contexte des sessions précédentes.
