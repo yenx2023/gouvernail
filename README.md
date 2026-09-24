@@ -93,12 +93,14 @@ les cinq suivants sont propres à Gouvernail.
 ## Outils externes recommandés (à installer à la demande)
 
 Contrairement au tableau ci-dessus, ces outils sont des **plugins Claude
-Code** (marketplace tierce) et ne sont jamais copiés par `/amorce-projet` —
-chaque projet les installe lui-même s'il en a l'usage.
+Code ou serveurs MCP tiers** (marketplace ou configuration MCP) et ne sont
+jamais copiés par `/amorce-projet` — chaque projet les installe lui-même
+s'il en a l'usage.
 
-| Outil | Rôle | Quand l'utiliser plutôt que Mermaid/`/illustre` |
+| Outil | Rôle | Quand l'utiliser plutôt que l'outillage natif du framework |
 |---|---|---|
 | [`diagram-design`](https://github.com/cathrynlavery/diagram-design) | Diagrammes techniques (architecture, ER, séquence, UML...) en HTML+SVG autonome | Livrable soigné hors document versionné (issue, présentation) — jamais pour un diagramme qui doit rester diffable dans une Merge Request, voir `CLAUDE.md` > *Outils externes recommandés*. |
+| [`mobile-mcp`](https://github.com/mobile-next/mobile-mcp) | Pilotage live d'un émulateur/simulateur par agent (arbre d'accessibilité, capture d'écran, tap/swipe/saisie), sans flow préécrit | Exploration d'une zone d'app non cartographiée ou diagnostic sans reproduction connue — jamais en remplacement de `/eprouve` (Maestro) pour la régression scriptée, voir `CLAUDE.md` > *Outils externes recommandés*. |
 
 ## Limitation connue
 
