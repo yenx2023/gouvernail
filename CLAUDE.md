@@ -229,6 +229,24 @@ Installation (à la demande, par projet, jamais committée dans ce dépôt) :
 /plugin install diagram-design@diagram-design
 ```
 
+**`mobile-mcp`** ([`mobile-next/mobile-mcp`](https://github.com/mobile-next/mobile-mcp)) —
+serveur MCP qui expose le pilotage direct d'un émulateur/simulateur
+(lecture de l'arbre d'accessibilité, capture d'écran, tap/swipe/saisie) à
+un agent Claude, sans flow préécrit. Vérifier licence et maintenance
+active avant adoption (cf. Dépendances, `CLAUDE.md.template`) — pas de
+commande d'installation fixée ici, la configuration MCP dépend du client
+et nécessite de toute façon un device/émulateur réellement disponible en
+session locale (même contrainte que `/eprouve`, voir ce skill >
+Prérequis — inutilisable en session Cloud). Utile en complément — jamais
+en remplacement — de `/eprouve` (Maestro), pour le testing E2E sur
+projet à surface visuelle/mobile :
+
+| Besoin | Outil | Pourquoi |
+|---|---|---|
+| Parcours de régression connu, à rejouer de façon fiable en continu (avant chaque Merge Request, après un refactor à risque) | **`/eprouve`** (Maestro) | Flow YAML versionné et revuable en MR, résultat déterministe, coût token nul à l'exécution une fois écrit. C'est le choix par défaut, y compris pour la quasi-totalité du testing E2E. |
+| Exploration d'une zone d'app non cartographiée, ou diagnostic d'un bug sans reproduction connue | **`mobile-mcp`** | L'agent lit l'écran et décide de chaque action en direct, sans script préalable — utile quand le parcours à suivre n'est pas encore connu. Coût token récurrent (relecture d'écran à chaque pas) : à ne jamais laisser porter un usage répété. |
+| Un chemin découvert via `mobile-mcp` s'avère stable et mérite d'être surveillé en continu | **Conversion vers `/eprouve`** | Le chemin exploratoire devient un flow Maestro versionné dès qu'il est stabilisé — jamais laissé dépendant d'un agent à chaque exécution, ni retenu comme seule preuve de bon fonctionnement (voir doctrine Tests, `CLAUDE.md.template`). |
+
 ## Langue de travail
 
 Toute réponse de Claude Code dans une session sur ce dépôt — messages de
