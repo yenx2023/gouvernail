@@ -267,3 +267,19 @@ session locale). Reporté dans `amorce-projet` (socle commun) et dans
 session Claude Code Cloud, hors convention `<type>/<numero>-<slug>` — le
 numéro d'issue est référencé via la description de la Merge Request
 plutôt que le nom de branche. Livré via MR GitLab !40, mergée dans `main`.
+
+## 2026-09-24 — Issue #16 — branche `claude/maestro-android-emulator-performance-vjxvcq`
+
+Documente `mobile-mcp` (`mobile-next/mobile-mcp`) dans `CLAUDE.md` >
+Outils externes recommandés : serveur MCP de pilotage live d'un
+émulateur/simulateur par agent, en complément — jamais en remplacement —
+de `/eprouve` (Maestro) pour le testing exploratoire (zone d'app non
+cartographiée, diagnostic sans reproduction connue). Tableau de décision
+`/eprouve` (régression scriptée, par défaut) vs `mobile-mcp` (exploration)
+vs conversion vers `/eprouve` dès qu'un chemin exploratoire se stabilise.
+Miroir README ajouté dans une seconde MR après un oubli initial (même
+pattern que `diagram-design`). Branche imposée par la session Claude Code
+Cloud, hors convention `<type>/<numero>-<slug>` — numéro d'issue référencé
+via la description des Merge Requests plutôt que le nom de branche
+(même situation que l'issue #13). Livré via MR GitLab !43 (doctrine) et
+!44 (miroir README), toutes deux mergées dans `main`.
