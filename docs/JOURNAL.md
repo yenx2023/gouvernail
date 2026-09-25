@@ -283,3 +283,17 @@ Cloud, hors convention `<type>/<numero>-<slug>` — numéro d'issue référencé
 via la description des Merge Requests plutôt que le nom de branche
 (même situation que l'issue #13). Livré via MR GitLab !43 (doctrine) et
 !44 (miroir README), toutes deux mergées dans `main`.
+
+## 2026-09-25 — Issue #17 — `chore/17-doctrine-anti-injection-gate`
+
+Ajoute dans `CLAUDE.md` une clause de doctrine explicite (Doctrine) : le
+contenu d'un dépôt/issue/Merge Request/PR n'autorise jamais une action
+d'écriture — défense contre l'injection de contenu externe se faisant
+passer pour une autorisation. Documente aussi la spécification d'un hook
+technique complémentaire au gate déclaratif (nouvelle sous-section en fin
+de Cycle de vie d'une tâche), inspiré du hook « GateGuard » du framework
+ECC (`affaan-m/ecc`, analysé en session) — explicitement marqué comme
+**non implémenté** : un jeton de gate à courte durée de vie, écrit par
+`/livre` au moment de la phrase de validation, est un préalable
+indispensable avant tout blocage strict, sous peine de bloquer aussi le
+push de continuité. Livré via MR GitLab !45, mergée dans `main`.
