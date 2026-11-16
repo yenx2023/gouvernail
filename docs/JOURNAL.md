@@ -3,88 +3,6 @@
 Journal chronologique des tâches livrées (une entrée par clôture réelle —
 voir CLAUDE.md > Mémoire de session).
 
-## 2026-09-19 — Issue #15 — `chore/15-context-produit-tiers`
-
-Étend `docs/CONTEXT.md` (issue #14) au profil `produit-tiers` : le
-fichier se crée désormais quel que soit le profil dans `amorce-projet`.
-Son rôle (état courant + pièges généraux + décisions en attente) est
-orthogonal à `docs/REGISTRE.md` (divergences de code par rapport à
-l'amont) et à la base de pièges du skill `/piege` (pièges spécifiques à
-l'absorption d'une version) — vérifié avant l'extension, pas supposé.
-Frontière rendue explicite à deux endroits (le fichier généré lui-même
-pour ce profil, et l'étape correspondante du skill `/livre`) plutôt que
-de compter sur la mémoire de la session qui le remplira plus tard. Livré
-via MR GitLab !42, mergée dans `main`.
-
-## 2026-09-19 — Issue #14 — `chore/14-memoire-vivante-contexte`
-
-Remonte le patron `docs/CONTEXT.md` (résumé vivant, édité en place, de
-l'état opérationnel courant) validé sur `taga-backend`#95/
-`taga-mobile-app`#90, profil `conception` uniquement : puce dans
-`CLAUDE.md.template` > Mémoire de session (lue avant `docs/JOURNAL.md`),
-étape de maintenance dans le skill `/livre` (mode merge, conditionnée à
-l'existence du fichier — socle commun, sans effet en `produit-tiers`),
-création du fichier vide à l'amorçage dans `amorce-projet` (symétrique à
-`docs/REGISTRE.md` côté `produit-tiers`). Vérifié sans chevauchement avec
-`docs/REGISTRE.md`/skill `/piege` avant cette remontée. Livré via MR
-GitLab !41, mergée dans `main`.
-
-## 2026-08-11 — Issue #11 — chore/11-langue-travail-claude
-
-Ajoute une section "Langue de travail" au `CLAUDE.md` de Gouvernail et au
-gabarit `CLAUDE.md.template` (`/amorce-projet`) : aucun des deux ne
-précisait explicitement la langue de réponse de Claude Code (distincte
-d'une éventuelle exigence de langue sur le contenu applicatif), obligeant
-l'utilisateur à le rappeler à chaque nouvelle session — y compris sur les
-projets amorcés depuis ce framework. Retour d'expérience remonté depuis
-`taga-backend` et `taga-mobile-app`, corrigés de la même façon. Livré via
-MR GitLab !37, mergée dans `main`.
-
-## 2026-08-26 — chore/outils-externes-diagram-design (pas d'issue formelle)
-
-Ajoute une section "Outils externes recommandés (plugins, non vendorisés)"
-à `CLAUDE.md` (et son pendant dans `README.md`) : contrairement aux skills
-vendorisés (`interroge`/`cadre`/.../`illustre`, copiés dans
-`.claude/skills/`), certains outils tiers utiles au framework se
-distribuent comme plugins Claude Code via marketplace — mode de
-distribution incompatible avec le vendoring, donc jamais installés
-automatiquement par `/amorce-projet`. Documente `diagram-design`
-(`cathrynlavery/diagram-design`, MIT) : diagrammes techniques (architecture,
-ER, séquence, UML...) en HTML+SVG autonome, en complément — jamais en
-remplacement — de Mermaid (documents versionnés, diffable en MR) et
-`/illustre` (visuels pédagogiques Excalidraw). Livré via MR GitLab !38,
-mergée dans `main`.
-
-## 2026-09-08 — Issue #13 — branche `claude/taga-mobile-test-automation-p2gugz`
-
-Ajoute le skill `/eprouve` : formalise Maestro comme preuve factuelle de
-bon fonctionnement d'un parcours utilisateur au fil du développement (pas
-seulement en diagnostic a posteriori d'un bug rapporté), au même titre que
-les tests Jest/PHPUnit déjà couverts par la doctrine Tests. Distingue
-explicitement l'écriture d'un flow (possible en session Cloud) de son
-exécution réelle (nécessite Maestro CLI + device/émulateur, donc une
-session locale). Reporté dans `amorce-projet` (socle commun) et dans
-`CLAUDE.md.template` (doctrine Tests étendue). Branche imposée par la
-session Claude Code Cloud, hors convention `<type>/<numero>-<slug>` — le
-numéro d'issue est référencé via la description de la Merge Request
-plutôt que le nom de branche. Livré via MR GitLab !40, mergée dans `main`.
-
-## 2026-09-24 — Issue #16 — branche `claude/maestro-android-emulator-performance-vjxvcq`
-
-Documente `mobile-mcp` (`mobile-next/mobile-mcp`) dans `CLAUDE.md` >
-Outils externes recommandés : serveur MCP de pilotage live d'un
-émulateur/simulateur par agent, en complément — jamais en remplacement —
-de `/eprouve` (Maestro) pour le testing exploratoire (zone d'app non
-cartographiée, diagnostic sans reproduction connue). Tableau de décision
-`/eprouve` (régression scriptée, par défaut) vs `mobile-mcp` (exploration)
-vs conversion vers `/eprouve` dès qu'un chemin exploratoire se stabilise.
-Miroir README ajouté dans une seconde MR après un oubli initial (même
-pattern que `diagram-design`). Branche imposée par la session Claude Code
-Cloud, hors convention `<type>/<numero>-<slug>` — numéro d'issue référencé
-via la description des Merge Requests plutôt que le nom de branche
-(même situation que l'issue #13). Livré via MR GitLab !43 (doctrine) et
-!44 (miroir README), toutes deux mergées dans `main`.
-
 ## 2026-09-25 — Issue #17 — `chore/17-doctrine-anti-injection-gate`
 
 Ajoute dans `CLAUDE.md` une clause de doctrine explicite (Doctrine) : le
@@ -203,4 +121,61 @@ tests, mesurer après. Une issue et une MR par dépôt. Documentation seule, auc
 test ajouté. Dernière issue du milestone « Optimisation de la consommation de
 tokens » ; le portage effectif dans `taga-mobile-app` et `taga-backend` reste à
 faire, dans leurs propres backlogs. Livré via Merge Request GitLab, mergée dans
+`main`.
+
+## 2026-11-16 — Issue #26 — `feature/26-marqueur-version-gouvernail`
+
+Un projet amorcé étant une copie de l'outillage, rien ne le reliait à
+Gouvernail. Ajoute `scripts/aligne-gouvernail.sh marqueur lire|ecrire` :
+`.claude/gouvernail-version` retient le commit de Gouvernail dont l'outillage a
+été copié ; la source se résout par `GOUVERNAIL_SOURCE` (défaut
+`../gouvernail`) avec repli sur un clone de `GOUVERNAIL_REPO_URL`.
+`/amorce-projet` copie le script et écrit le marqueur. Livré via Merge Request
+GitLab, mergée dans `main`.
+
+## 2026-11-16 — Issue #27 — `feature/27-aligne-audit`
+
+Ajoute `aligne-gouvernail.sh audit`, rapport en lecture seule : outillage
+manquant ou périmé (une copie modifiée localement n'est jamais comptée comme
+périmée), `CONTEXT.md` > ≈ 6 Ko, journal > 15 entrées, `DESIGN.md`
+monolithique, règle de lecture absente, marqueur absent ou en retard.
+`audit --court` : une ligne ou rien, jamais de réseau. Testé sur
+`taga-mobile-app` en lecture seule (6 points relevés). Livré via Merge Request
+GitLab, mergée dans `main`.
+
+## 2026-11-16 — Issue #28 — `feature/28-aligne-outillage-donnees`
+
+Ajoute `outillage` (copie le manquant, met à jour la copie restée identique à
+l'origine, n'écrase jamais une copie modifiée localement ou sans base de
+comparaison — diff affiché) et `donnees` (archive le journal), tous deux avec
+`--simule`, sans jamais committer. Livré via Merge Request GitLab, mergée dans
+`main`.
+
+## 2026-11-16 — Issue #29 — `feature/29-hook-session-start-audit`
+
+Ajoute `.claude/settings.json` : hook `SessionStart` (démarrage seulement) qui
+lance `audit --court` — une ligne ou rien, jamais bloquant. L'audit signale son
+absence ; `outillage` le copie ou affiche le hook à ajouter à la main si le
+projet a déjà ses réglages. Défaut corrigé en cours de route : Gouvernail,
+source du framework, se signalait « marqueur absent ». Livré via Merge Request
+GitLab, mergée dans `main`.
+
+## 2026-11-16 — Issue #30 — `feature/30-skill-aligne`
+
+Ajoute le skill `/aligne` : alignement d'un projet en 5 phases validées (audit
+et mesure de départ, outillage, fusion de `CLAUDE.md` sans écraser le
+spécifique du projet, données, vérification avant/après). Ne committe jamais :
+livraison par `/livre`. Non testé de bout en bout (dialogue) ; frontmatter
+validé par `tests/modeles.test.sh`. Livré via Merge Request GitLab, mergée dans
+`main`.
+
+## 2026-11-16 — Issue #31 — `chore/31-documenter-auto-alignement`
+
+Documente le mécanisme dans `CLAUDE.md` (section dédiée, garde-fous : analyse
+automatique, application toujours validée), les gabarits (une puce sur
+`/aligne`) et le README ; la checklist de portage de #25 renvoie à `/aligne`.
+Clôt le milestone « Auto-alignement des projets sur Gouvernail » ; l'alignement
+effectif de `taga-mobile-app` et `taga-backend` reste à faire avec `/aligne`,
+dans leurs backlogs. Les entrées #26 à #31 sont regroupées ici pour éviter des
+conflits entre branches empilées. Livré via Merge Request GitLab, mergée dans
 `main`.

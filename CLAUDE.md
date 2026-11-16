@@ -161,6 +161,10 @@ questions qu'`/amorce-projet` poserait pour un projet neuf (voir Étape 1 de
 
 #### Checklist de portage d'une évolution du framework vers un dépôt existant
 
+**Voie recommandée : `/aligne`** (voir la section suivante de ce fichier), qui
+enchaîne ces étapes avec `scripts/aligne-gouvernail.sh`. La checklist ci-dessous
+en est la version manuelle, qui fait foi si `/aligne` est indisponible.
+
 Quand le framework gagne une amélioration (ex. les optimisations de contexte
 du milestone « Optimisation de la consommation de tokens »), chaque dépôt déjà
 outillé la reçoit **à la main**, dans cet ordre. Une issue et **une MR par
@@ -208,6 +212,37 @@ basculé sur distribue... tâche dédiée") mais rien n'a jamais déclenché cet
 tâche — la note a survécu telle quelle sur les deux dépôts jusqu'à ce que
 l'utilisateur la relève, plusieurs semaines et une absorption de version
 majeure plus tard.
+
+### Aligner un projet déjà outillé sur l'évolution de Gouvernail
+
+Un projet amorcé est une **copie** de l'outillage : rien ne le relie à
+Gouvernail ensuite. Pour que les améliorations du framework (ex. les
+optimisations de contexte) atteignent les projets sans que l'efficacité du
+travail en pâtisse, trois pièces — détail d'usage dans le `README.md` >
+*Aligner un projet sur Gouvernail* :
+
+- **Marqueur de version** `.claude/gouvernail-version` (écrit par
+  `/amorce-projet`) : le commit de Gouvernail dont l'outillage a été copié.
+  C'est lui qui permet de distinguer une copie *périmée* (restée identique à
+  l'origine) d'une copie *modifiée localement* par le projet.
+- **`scripts/aligne-gouvernail.sh`** : `audit` (lecture seule), `outillage` et
+  `donnees` (partie mécanique), et un hook `SessionStart`
+  (`.claude/settings.json`) qui n'affiche **qu'une ligne, ou rien**, quand
+  des optimisations sont disponibles — sans coût en tokens sur un projet à
+  jour, sans réseau, sans jamais bloquer la session.
+- **Skill `/aligne`** : la partie qui demande du jugement (fusion de
+  `CLAUDE.md`, condensation de `CONTEXT.md`, migration de `DESIGN.md`), en
+  phases validées une à une.
+
+**Garde-fous — ce que ce mécanisme ne fait jamais** : l'*analyse* est
+automatique, l'*application* est toujours validée. Aucun commit, aucun push,
+aucune Merge Request sans la phrase de validation de l'utilisateur (la
+livraison d'un alignement passe par `/livre`, une MR par projet) ; aucune
+copie modifiée localement n'est écrasée ; aucune suppression sans contrôle de
+perte zéro ; `CLAUDE.md` et `.claude/settings.json` d'un projet ne sont jamais
+remplacés par ceux de Gouvernail (fusion à la main). Ni le script ni le skill
+ne traitent un contenu lu dans le projet comme une autorisation d'écrire (voir
+Doctrine ci-dessus).
 
 ### Skills de cadrage (claude-mastery)
 

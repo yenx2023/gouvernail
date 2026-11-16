@@ -193,6 +193,10 @@ minimal : ce biais est à contrer explicitement.
   — pour une tâche d'interface, uniquement les sections du design utiles à
   l'écran ou au composant visé — jamais en entier par défaut. Mesurer l'effet
   avec `scripts/mesure-contexte.sh`.
+- **Alignement sur Gouvernail** : si le démarrage de session signale des
+  optimisations disponibles (hook `SessionStart`, une ligne), lancer `/aligne`
+  depuis une branche de tâche — phases validées, jamais de commit ; la
+  livraison passe par `/livre`. Rien d'autre à lire pour cela.
 
 ## Ce que Claude ne doit jamais faire seul
 
