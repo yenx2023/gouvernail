@@ -54,10 +54,13 @@ for name in CONTEXT JOURNAL PRD PLAN DESIGN; do
 done
 print_total "début de session"
 
-for file in "$ROOT"/docs/*.md; do
+# docs/*.md hors liste de début de session, puis docs/design/*.md (détail du
+# design system, lu à la demande — voir le skill /design)
+for file in "$ROOT"/docs/*.md "$ROOT"/docs/design/*.md; do
   [ -f "$file" ] || continue
-  case "$(basename "$file")" in CONTEXT.md|JOURNAL.md|PRD.md|PLAN.md|DESIGN.md) continue ;; esac
-  print_line "autres docs" "docs/$(basename "$file")"
+  rel="${file#"$ROOT"/}"
+  case "$rel" in docs/CONTEXT.md|docs/JOURNAL.md|docs/PRD.md|docs/PLAN.md|docs/DESIGN.md) continue ;; esac
+  print_line "autres docs" "$rel"
 done
 print_total "autres docs"
 

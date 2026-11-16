@@ -493,7 +493,8 @@ encore implémentée** — à reprendre dans une tâche dédiée avant mise en
   du contexte d'une tâche précise.
 - **Règle de lecture de début de session** : lire d'abord le résumé
   (`docs/CONTEXT.md` s'il existe), puis seulement ce que la tâche exige.
-  Un document long (journal, `docs/DESIGN.md`) se lit par recherche ou par
+  Un document long (journal, `docs/DESIGN.md`, qui est un index : lire ensuite
+  le seul fichier de `docs/design/` utile) se lit par recherche ou par
   section, jamais en entier par défaut. Mesurer l'effet avec
   `scripts/mesure-contexte.sh`.
 - `docs/BACKLOG.md` : optionnel, miroir lisible du backlog GitLab si besoin

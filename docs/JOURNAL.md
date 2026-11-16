@@ -350,3 +350,18 @@ Claude Code ignore sans erreur un champ mal formé, et interdit Haiku sur un
 skill qui écrit sur git/GitLab. `/amorce-projet` copie agents et test.
 Effet réel non mesuré en session (à vérifier avec `/cost`). Livré via Merge
 Request GitLab, mergée dans `main`.
+
+## 2026-11-16 — Issue #21 — `feature/21-design-index-par-theme`
+
+Le skill `/design` produit désormais `docs/DESIGN.md` comme **index court**
+(cible ≤ ~18 Ko, ≈ 5 k tokens : contexte produit, direction esthétique,
+tableau « quel fichier lire ») et le détail dans `docs/design/` (`tokens.md`,
+`composants.md`, `ecarts.md`), lu à la demande. Règle de croissance : tout
+ajout va dans les fichiers de thème, scindés au-delà de ~40 Ko. Ajoute une
+option **migrer** pour un `DESIGN.md` monolithique (déplacement à
+l'identique, contrôle de perte zéro avant suppression). La règle de lecture
+de #19 (`CLAUDE.md` + gabarits) précise que `DESIGN.md` est un index ;
+`scripts/mesure-contexte.sh` compte aussi `docs/design/*.md` (+4 tests).
+Migration non testée sur un vrai `DESIGN.md` (le découpage effectif de
+TAGA, ≈ 55 k tokens, se fera au portage #25). Livré via Merge Request
+GitLab, mergée dans `main`.
