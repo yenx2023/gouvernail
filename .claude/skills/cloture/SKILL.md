@@ -63,7 +63,10 @@ une issue déjà livrée et met à jour la trace correspondante dans
      '{"body":"Issue clôturée — travail livré et confirmé."}'
    ```
 6. **Mettre à jour `docs/JOURNAL.md`** : chercher l'entrée existante qui
-   mentionne cette issue (créée par `/livre` au moment du merge). Si trouvée,
+   mentionne cette issue (créée par `/livre` au moment du merge) dans le
+   journal **et** dans ses archives
+   (`grep -n "Issue #<n>" docs/JOURNAL.md docs/archive/JOURNAL-*.md`).
+   Si trouvée (même archivée),
    lui ajouter une ligne `Clôturée le <date du jour>.` à la fin. Si aucune
    entrée ne mentionne cette issue (clôture sans passage préalable par
    `/livre`, cas rare), créer une entrée minimale avec la date, le numéro
