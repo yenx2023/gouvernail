@@ -486,8 +486,16 @@ encore implémentée** — à reprendre dans une tâche dédiée avant mise en
 ## Mémoire de session
 
 - `docs/JOURNAL.md` : journal chronologique des tâches livrées, une entrée par
-  clôture (date, numéro d'issue GitLab, branche, résumé). Toujours le lire en
-  début de session pour retrouver le contexte des sessions précédentes.
+  clôture (date, numéro d'issue GitLab, branche, résumé). **Ne pas le lire en
+  entier en début de session** (il grossit à chaque livraison) : consulter la
+  fin du fichier (`tail`) pour les dernières entrées, ou chercher par numéro
+  d'issue / mot-clé (`grep -n "Issue #<n>" docs/JOURNAL.md`) quand on a besoin
+  du contexte d'une tâche précise.
+- **Règle de lecture de début de session** : lire d'abord le résumé
+  (`docs/CONTEXT.md` s'il existe), puis seulement ce que la tâche exige.
+  Un document long (journal, `docs/DESIGN.md`) se lit par recherche ou par
+  section, jamais en entier par défaut. Mesurer l'effet avec
+  `scripts/mesure-contexte.sh`.
 - `docs/BACKLOG.md` : optionnel, miroir lisible du backlog GitLab si besoin
   d'une vue hors-ligne — le backlog GitLab reste la référence en cas d'écart.
 

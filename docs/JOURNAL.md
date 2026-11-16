@@ -308,3 +308,15 @@ milestone « Optimisation de la consommation de tokens ». Couvert par
 `tests/mesure-contexte.test.sh` (16 tests hors-ligne, validés sous bash 3.2
 macOS) ; usage documenté dans le README. Livré via Merge Request GitLab,
 mergée dans `main`.
+
+## 2026-11-16 — Issue #19 — `feature/19-regles-lecture-debut-session`
+
+Ajoute une règle de lecture de début de session dans la section « Mémoire de
+session » du `CLAUDE.md` de Gouvernail et des deux gabarits (`conception`,
+`produit-tiers`) : `CONTEXT.md` d'abord, `JOURNAL.md` jamais lu en entier
+(`tail` ou `grep` sur le n° d'issue), documents longs (`DESIGN.md`) lus par
+section ; `REGISTRE.md` garde ses lectures obligatoires en `produit-tiers`.
+Renvoie à `scripts/mesure-contexte.sh` pour chiffrer l'effet. Le gain réel
+(≈ 22–38 k tokens de journal + ≈ 45 k de design sur les sessions UI de TAGA)
+se vérifiera au portage (#25). Livré via Merge Request GitLab, mergée dans
+`main`.
