@@ -78,7 +78,7 @@ explicitement.
 | `/interroge` | Questionnement structuré pour cadrer une idée de feature/app. |
 | `/cadre` | Produit ou étend `docs/PRD.md` (8 sections fixes). |
 | `/planifie` | Découpe le PRD en phases verticales, produit `docs/PLAN.md`. |
-| `/design` | Produit `docs/DESIGN.md` + preview HTML du système de design. |
+| `/design` | Produit `docs/DESIGN.md` (index court) + `docs/design/*.md` (tokens, composants, écarts : détail lu à la demande) + preview HTML. Migre aussi un `DESIGN.md` monolithique existant. |
 | `/investigue` | Investigation méthodique d'un bug en 4 phases validées. |
 | `/illustre` | Diagrammes et visuels Excalidraw. |
 | `/backlog-gitlab` | Convertit un PRD/PLAN en Milestones + Issues GitLab. |

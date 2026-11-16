@@ -1,17 +1,21 @@
 ---
 name: design
-description: Consulte sur le système de design d'un produit et produit `docs/DESIGN.md` + un preview HTML (spécimen typo + palette + 1 mockup d'écran). Propose un système cohérent et opinioné (aesthetic, typographie, color, layout, spacing, motion) avec breakdown SAFE/RISK. Utilise sur /design, "crée le design system", "écris DESIGN.md", "design depuis zéro", "système de design", "design consultation", "fais-moi un design system", ou dès qu'il faut formaliser l'identité visuelle d'un projet. Pair naturel de /cadre (PRD amont) et /planifie (plan d'impl aval).
+description: Consulte sur le système de design d'un produit et produit `docs/DESIGN.md` (index court) + `docs/design/*.md` (détail par thème, lu à la demande) + un preview HTML (spécimen typo + palette + 1 mockup d'écran). Propose un système cohérent et opinioné (aesthetic, typographie, color, layout, spacing, motion) avec breakdown SAFE/RISK. Utilise sur /design, "crée le design system", "écris DESIGN.md", "design depuis zéro", "système de design", "design consultation", "fais-moi un design system", ou dès qu'il faut formaliser l'identité visuelle d'un projet. Pair naturel de /cadre (PRD amont) et /planifie (plan d'impl aval).
 ---
 
 # /design
 
-Designer consultant, pas formulaire. Tu proposes un système de design cohérent et opinioné, tu justifies chaque choix, tu acceptes les ajustements. La cohérence prime sur l'optimisation locale d'une section. Sortie dans `docs/DESIGN.md` + preview HTML.
+Designer consultant, pas formulaire. Tu proposes un système de design cohérent et opinioné, tu justifies chaque choix, tu acceptes les ajustements. La cohérence prime sur l'optimisation locale d'une section. Sortie : `docs/DESIGN.md` (**index court**, lu en premier) + `docs/design/*.md` (détail par thème, lu **à la demande**) + preview HTML. Un design system qui grossit dans un seul fichier finit par coûter des dizaines de milliers de tokens à chaque tâche d'interface : la structure ci-dessous l'évite dès la première écriture.
 
 ## Process
 
 ### 1. Cadrage produit
 
-Si `docs/DESIGN.md` existe, lis-le et demande : *« Tu veux **mettre à jour**, **repartir de zéro**, ou **annuler** ? »*. Sinon, explore `README.md`, `package.json`, `src/`, `app/`, `pages/` pour pré-remplir ce que tu peux deviner du produit.
+Si `docs/DESIGN.md` existe, lis-le d'abord (`wc -c` avant : s'il dépasse ~18 Ko, ne le lis pas en entier, lis son début et ses titres `##`). Deux cas :
+- **Il contient la section « Index — quel fichier lire »** : c'est déjà un index. Ne lis ensuite que les fichiers de `docs/design/` concernés par la demande.
+- **Il n'en contient pas** (DESIGN.md monolithique, hérité d'avant cette structure) : propose en plus l'option **migrer** (voir « Migration d'un DESIGN.md monolithique »).
+
+Demande : *« Tu veux **mettre à jour**, **repartir de zéro**, **migrer** vers index + fichiers par thème (si monolithique), ou **annuler** ? »*. Sinon, explore `README.md`, `package.json`, `src/`, `app/`, `pages/` pour pré-remplir ce que tu peux deviner du produit.
 
 Pose UNE seule question qui couvre tout :
 
@@ -59,7 +63,7 @@ Génère ensuite le preview HTML selon `<preview-template>` et écris-le dans `d
 
 Si le user demande à ajuster une section, propose 2-3 alternatives pour CETTE section avec rationale courte. Re-vérifie la cohérence avec le reste après changement — flag les mismatches en une ligne (jamais bloquer). Régénère le preview si un changement visuel le justifie.
 
-Quand le user valide, écris `docs/DESIGN.md` selon `<design-template>` (crée `docs/` au besoin) et confirme *« ✓ écrit dans `docs/DESIGN.md` »*. Le preview HTML reste dans `docs/design-preview.html` (artefact jetable, ignorable par git).
+Quand le user valide, écris les quatre fichiers selon `<design-index-template>`, `<design-tokens-template>`, `<design-composants-template>` et `<design-ecarts-template>` (crée `docs/` et `docs/design/` au besoin) et confirme *« ✓ écrit : `docs/DESIGN.md` (index) + `docs/design/tokens.md`, `composants.md`, `ecarts.md` »*. Les valeurs (palette, fonts, échelles) vont **uniquement** dans `tokens.md` : l'index renvoie, il ne recopie pas. Le preview HTML reste dans `docs/design-preview.html` (artefact jetable, ignorable par git).
 
 ## Design Knowledge (informe tes propositions, ne présente JAMAIS comme un menu)
 
@@ -98,8 +102,28 @@ Cette palette curée est ton book : pioche dedans pour construire la proposition
 - **Patterns visuels interdits** : gradient purple/violet par défaut, grid 3-col avec icônes en cercles colorés, centered-everything, border-radius bubble partout, gradient buttons en CTA primaire, hero stock-photo générique, `system-ui` / `-apple-system` en display ou body (le signal « j'ai abandonné la typo »)
 - **Copy interdite** : « Built for X », « Designed for Y »
 
-<design-template>
+## Structure et taille (règle de croissance)
+
+- **`docs/DESIGN.md` = index**, cible ≤ ~18 Ko (≈ 5 k tokens). Contexte produit, direction esthétique, tableau d'index. Rien d'autre n'y grossit.
+- **Toute croissance va dans `docs/design/`** : un nouveau composant → `composants.md` ; un écart ou une décision → `ecarts.md` ; une valeur → `tokens.md`. Jamais dans l'index.
+- **Un fichier de thème qui dépasse ~40 Ko (≈ 10 k tokens) se scinde** par sous-thème (ex. `composants-formulaires.md`, `composants-navigation.md`) et l'index est mis à jour dans la même modification.
+- **Lecture** : pour une tâche d'interface, index puis le seul fichier concerné — jamais l'ensemble (voir `CLAUDE.md` > Mémoire de session).
+- Mesurer l'effet avec `scripts/mesure-contexte.sh` (l'index apparaît en « début de session », le détail dans « autres docs »).
+
+## Migration d'un DESIGN.md monolithique
+
+Sur demande (option **migrer**), sans changer le contenu — c'est un déplacement, pas une réécriture :
+1. `wc -c docs/DESIGN.md` et liste des titres (`grep -n '^## ' docs/DESIGN.md`) ; ne lis que le nécessaire pour classer chaque section.
+2. Classe chaque section `##` : tokens (typo, couleur, espacement, grille, rayons, motion, dark mode) → `tokens.md` ; composants → `composants.md` ; écarts, hors périmètre, Decisions Log → `ecarts.md` ; le reste (écrans, parcours, règles propres au produit) → un fichier de thème dédié par ensemble cohérent (`docs/design/<theme>.md`). Contexte produit et direction esthétique restent dans l'index.
+3. Déplace les sections **telles quelles** (texte repris à l'identique), renvois internes mis à jour.
+4. Écris l'index (`<design-index-template>`) avec le tableau complet des fichiers créés.
+5. **Vérifie la perte zéro** : somme des octets des nouveaux fichiers ≈ octets d'origine (écart = en-têtes ajoutés seulement), et chaque titre `##` d'origine retrouvé dans exactement un fichier. Présente le résultat avant/après au user (`scripts/mesure-contexte.sh`) ; ne supprime l'ancien contenu qu'une fois ce contrôle fait.
+6. Si l'index dépasse ~18 Ko, déplace dans un fichier de thème ce qui n'est pas indispensable à toute tâche.
+
+<design-index-template>
 # Design System — <nom du projet>
+
+> **Index** — lire ce fichier en premier, puis **seulement** le fichier de `docs/design/` utile à la tâche. Ne jamais charger tout `docs/design/` par défaut. Ce fichier reste court (cible ≤ ~18 Ko, ≈ 5 k tokens) : le détail et toute croissance vont dans `docs/design/`.
 
 ## Product Context
 - **Quoi** : <1-2 phrases>
@@ -113,6 +137,22 @@ Cette palette curée est ton book : pioche dedans pour construire la proposition
 - **Décoration** : <minimal / intentionnel / expressif>
 - **Mood** : <1-2 phrases sur le ressenti>
 - **Références** : <URLs, si recherche>
+
+## Index — quel fichier lire
+| Pour une tâche sur… | Lire |
+|---|---|
+| Typographie, couleur, espacement, grille, rayons, motion, dark mode | `docs/design/tokens.md` |
+| Un composant (bouton, champ, carte, alerte, navigation…) | `docs/design/composants.md` |
+| Un écart au système, une décision, ce qui est hors périmètre | `docs/design/ecarts.md` |
+| <thème ajouté plus tard, ex. un écran ou parcours précis> | `docs/design/<theme>.md` |
+
+Tout nouveau fichier de thème est ajouté à ce tableau — un fichier non référencé ici ne sera jamais lu.
+</design-index-template>
+
+<design-tokens-template>
+# Design — Tokens
+
+Source de vérité des valeurs du système (l'index `docs/DESIGN.md` renvoie ici, ne les recopie pas).
 
 ## Typography
 - **Display/Hero** : <font> — <rationale>
@@ -145,12 +185,29 @@ Cette palette curée est ton book : pioche dedans pour construire la proposition
 - **Approche** : <minimal-fonctionnel / intentionnel / expressif>
 - **Easing** : enter(ease-out) exit(ease-in) move(ease-in-out)
 - **Duration** : micro(50-100ms) court(150-250ms) moyen(250-400ms) long(400-700ms)
+</design-tokens-template>
+
+<design-composants-template>
+# Design — Composants
+
+Spécification des composants, un `##` par composant (usage, variantes, états, tokens utilisés). Les valeurs viennent de `docs/design/tokens.md` — référencer, ne pas recopier.
+
+_Aucun composant spécifié pour l'instant._
+</design-composants-template>
+
+<design-ecarts-template>
+# Design — Écarts et décisions
+
+Écarts assumés au système, hors périmètre, et journal des décisions.
+
+## Écarts et hors périmètre
+_Aucun pour l'instant._
 
 ## Decisions Log
 | Date | Décision | Rationale |
 |------|----------|-----------|
 | <today> | Création initiale | /design — <résumé contexte produit> |
-</design-template>
+</design-ecarts-template>
 
 <preview-template>
 Un seul fichier HTML self-contained, écrit dans `docs/design-preview.html` (chemin relatif au projet, portable — pas de temp dir à résoudre). Pas de framework, pas de build. Structure :
@@ -173,4 +230,5 @@ Un seul fichier HTML self-contained, écrit dans `docs/design-preview.html` (che
 - Chaque reco a un « parce que » concret, lié au produit ou au public, pas générique.
 - Vocabulaire du produit, verbatim — pas de re-naming en anglais marketing.
 - Accepte le choix final du user, même contre ton avis : nudge sur la cohérence (1 ligne), jamais bloquer ni refuser d'écrire.
-- Plan mode : exception autorisée — `docs/DESIGN.md` et le preview HTML sont des artefacts de design read-only, pas du code de prod.
+- `docs/DESIGN.md` reste un index : ne jamais y faire grossir du détail (voir « Structure et taille »).
+- Plan mode : exception autorisée — `docs/DESIGN.md`, `docs/design/*.md` et le preview HTML sont des artefacts de design read-only, pas du code de prod.

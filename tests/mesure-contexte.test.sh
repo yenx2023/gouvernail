@@ -56,6 +56,19 @@ assert_contains "$OUT" "docs/AUTRE.md" "liste le doc hors liste"
 assert_contains "$OUT" ".claude/skills/demo/SKILL.md" "liste les SKILL.md"
 assert_contains "$OUT" "500" "estime 1850 octets de skill à 500 tokens"
 
+echo "== design system en index + fichiers par thème =="
+mkdir -p "$FIXTURE/docs/design"
+head -c 740 /dev/zero | tr '\0' 'a' > "$FIXTURE/docs/DESIGN.md"          # index → début de session
+head -c 1110 /dev/zero | tr '\0' 'a' > "$FIXTURE/docs/design/tokens.md"  # détail → autres docs
+OUT="$("$MESURE" "$FIXTURE")"
+assert_contains "$OUT" "docs/DESIGN.md" "liste l'index DESIGN.md"
+assert_contains "$OUT" "docs/design/tokens.md" "liste le détail docs/design/*.md"
+DESIGN_LINE="$(printf '%s\n' "$OUT" | grep -F 'docs/DESIGN.md')"
+assert_contains "$DESIGN_LINE" "début de session" "classe l'index DESIGN.md en début de session"
+TOKENS_LINE="$(printf '%s\n' "$OUT" | grep -F 'docs/design/tokens.md')"
+assert_contains "$TOKENS_LINE" "autres docs" "classe docs/design/*.md en autres docs (lu à la demande)"
+rm -rf "$FIXTURE/docs/design" "$FIXTURE/docs/DESIGN.md"
+
 echo "== catégories vides omises =="
 mkdir -p "$FIXTURE/minimal"
 echo "x" > "$FIXTURE/minimal/CLAUDE.md"
