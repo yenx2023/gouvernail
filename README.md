@@ -85,10 +85,11 @@ explicitement.
 | `/tache` | Crée la branche locale liée à une issue GitLab existante. |
 | `/livre` | Le vrai gate : commit, push, ouverture puis merge d'une MR GitLab. |
 | `/cloture` | Ferme une issue hors du flux normal de merge. |
+| `/aligne` | Aligne un projet déjà outillé sur l'évolution de Gouvernail, en phases validées (outillage, fusion de `CLAUDE.md`, journal/contexte/design, mesure avant/après). Ne committe jamais : livraison par `/livre`. |
 
 Les six premiers (`interroge` à `illustre`) sont vendorisés depuis
 [`claude-mastery`](https://github.com/naiersaidane/claude-mastery) (MIT) ;
-les cinq suivants sont propres à Gouvernail.
+les suivants sont propres à Gouvernail.
 
 ## Outils externes recommandés (à installer à la demande)
 
@@ -287,6 +288,13 @@ rien n'est fusionné automatiquement : le hook à ajouter est affiché.
 
 Le script ne committe ni ne pousse jamais : la livraison d'un alignement
 passe par `/livre` (branche + Merge Request).
+
+**`/aligne`** orchestre le tout pour la partie qui demande du jugement
+(fusionner `CLAUDE.md` sans écraser le spécifique du projet, condenser
+`CONTEXT.md`, migrer `DESIGN.md`), en 5 phases où chacune attend votre
+validation : audit et mesure de départ, outillage, `CLAUDE.md`, données,
+vérification avant/après. Il se lance depuis une branche de tâche
+(`/tache`), une MR par projet.
 
 ## Aller plus loin
 

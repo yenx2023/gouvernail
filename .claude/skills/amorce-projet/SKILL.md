@@ -149,6 +149,7 @@ divergent trop pour deviner.
      `.claude/skills/cloture/`, `.claude/skills/interroge/`,
      `.claude/skills/investigue/`, `.claude/skills/illustre/`,
      `.claude/skills/design/`, `.claude/skills/eprouve/`,
+     `.claude/skills/aligne/`,
      `.claude/skills/LICENSE-claude-mastery`. `/eprouve` (validation E2E
      Maestro, voir `CLAUDE.md.template` > Tests et `docs/DOCTRINE.md`) n'a d'usage réel que sur
      un projet à surface visuelle/interactive (mobile, frontend web) mais
