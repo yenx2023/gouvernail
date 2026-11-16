@@ -139,7 +139,12 @@ ouverte existe déjà pour la branche), puis :
     Si l'issue n'a pas de milestone, sauter cette étape.
 11. Ajouter une entrée dans `docs/JOURNAL.md` (créer le fichier avec un
     titre "# Journal" s'il n'existe pas) : date du jour, numéro d'issue,
-    nom de branche, résumé en une phrase du travail livré.
+    nom de branche, résumé en une phrase du travail livré. **Puis
+    archiver le journal** : `scripts/archive-journal.sh` (garde les 15
+    entrées les plus récentes selon la date du titre, déplace les autres
+    dans `docs/archive/JOURNAL-<année>.md` ; sans effet tant que le
+    journal ne dépasse pas ce seuil). Inclure `docs/archive/` dans le
+    commit.
 12. **Si `docs/CONTEXT.md` existe** (créé par `/amorce-projet` quel que
     soit le profil, voir CLAUDE.md > Mémoire de session) et que cette
     livraison change l'état courant du projet ou révèle un piège
@@ -150,15 +155,20 @@ ouverte existe déjà pour la branche), puis :
     quelque chose de nouveau à ce niveau (une entrée `docs/JOURNAL.md` ne
     suffit pas à elle seule à déclencher cette étape). Respecter la
     discipline de taille déjà indiquée en tête du fichier (pas
-    d'accumulation illimitée de pièges). **En profil `produit-tiers`** :
+    d'accumulation illimitée de pièges). **Taille cible : ≈ 6 Ko** —
+    vérifier `wc -c docs/CONTEXT.md` à chaque livraison, même quand rien
+    d'autre n'y change ; au-delà, condenser dans cette même livraison
+    (retirer ce qui est résolu ou déjà couvert par `docs/PLAN.md` /
+    `docs/JOURNAL.md`, renvoyer plutôt que recopier). **En profil
+    `produit-tiers`** :
     un piège rencontré en absorbant une version amont va dans la base de
     pièges du skill `/piege`, jamais dans `docs/CONTEXT.md` (voir la
     frontière posée dans ce fichier lui-même) ; une divergence de code va
     dans `docs/REGISTRE.md` via `/registre`, pas ici non plus.
 13. Récapituler à l'utilisateur : MR mergée (URL), branche de base
     resynchronisée sur GitHub (le cas échéant), issue fermée (+ milestone
-    fermé si c'était le cas), `docs/JOURNAL.md` mis à jour (+
-    `docs/CONTEXT.md` si touché).
+    fermé si c'était le cas), `docs/JOURNAL.md` mis à jour (+ nombre
+    d'entrées archivées le cas échéant, + `docs/CONTEXT.md` si touché).
 
 Pour fermer une issue **en dehors** de ce flux (décidée comme non
 pertinente, doublon, ou rattrapage d'une clôture manquée) : skill

@@ -127,6 +127,12 @@ bash tests/gitlab-api.test.sh
 bash tests/mesure-contexte.test.sh
 ```
 
+`scripts/archive-journal.sh` est couvert par `tests/archive-journal.test.sh` :
+
+```
+bash tests/archive-journal.test.sh
+```
+
 Le frontmatter des subagents et des skills (`model:`, `effort:`, `name`,
 garde-fous) est validé par `tests/modeles.test.sh` :
 
@@ -179,10 +185,29 @@ scripts/mesure-contexte.sh                      # ce dépôt
 scripts/mesure-contexte.sh ../taga-mobile-app   # un projet frère
 ```
 
+## Garder le journal et le contexte courts
+
+`docs/JOURNAL.md` grossit à chaque livraison et `docs/CONTEXT.md` doit rester
+un résumé : `/livre` (mode merge) applique donc deux règles à chaque merge.
+
+- **Journal** : `scripts/archive-journal.sh [--garder N] [journal]` garde les
+  N entrées les plus récentes (15 par défaut, selon la date de leur titre) et
+  déplace les autres dans `docs/archive/JOURNAL-<année>.md` — rien n'est
+  perdu, ces archives s'interrogent par `grep`. Sans effet sous le seuil, donc
+  sûr à relancer.
+- **Contexte** : `docs/CONTEXT.md` vise ≈ 6 Ko (`wc -c`) ; au-delà, `/livre`
+  le condense dans la même livraison.
+
+```
+scripts/archive-journal.sh                  # journal de ce dépôt, 15 entrées gardées
+scripts/archive-journal.sh --garder 10      # seuil personnalisé
+```
+
 ## Aller plus loin
 
 - `CLAUDE.md` — doctrine complète : ce que Claude ne doit jamais faire seul,
   convention de nommage des branches, sécurité du token, répartition
   REST/GraphQL vérifiée en conditions réelles.
 - `docs/JOURNAL.md` — journal chronologique des tâches livrées sur ce
-  dépôt, à lire en début de session pour retrouver le contexte.
+  dépôt (les plus anciennes entrées sont dans `docs/archive/`), à consulter
+  par recherche plutôt qu'en entier.

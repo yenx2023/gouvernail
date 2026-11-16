@@ -491,6 +491,10 @@ encore implémentée** — à reprendre dans une tâche dédiée avant mise en
   fin du fichier (`tail`) pour les dernières entrées, ou chercher par numéro
   d'issue / mot-clé (`grep -n "Issue #<n>" docs/JOURNAL.md`) quand on a besoin
   du contexte d'une tâche précise.
+  Archivé par `/livre` (mode merge) via `scripts/archive-journal.sh` : le
+  journal garde les 15 entrées les plus récentes, les autres vont dans
+  `docs/archive/JOURNAL-<année>.md` (à interroger par `grep`, jamais en
+  entier).
 - **Règle de lecture de début de session** : lire d'abord le résumé
   (`docs/CONTEXT.md` s'il existe), puis seulement ce que la tâche exige.
   Un document long (journal, `docs/DESIGN.md`, qui est un index : lire ensuite

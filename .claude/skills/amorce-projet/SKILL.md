@@ -162,8 +162,10 @@ divergent trop pour deviner.
      Sonnet — voir README > Choisir le modèle selon la tâche)
    - `scripts/gitlab-api.sh`
    - `scripts/mesure-contexte.sh`
+   - `scripts/archive-journal.sh`
    - `tests/gitlab-api.test.sh`
    - `tests/mesure-contexte.test.sh`
+   - `tests/archive-journal.test.sh`
    - `tests/modeles.test.sh`
    - `.env.example`
    - `docs/DOCTRINE.md` ← `references/doctrine-technique.md` (détail des
@@ -211,7 +213,8 @@ divergent trop pour deviner.
 
    Mis à jour lors de chaque livraison (/livre, mode merge) si la tâche
    change l'état courant ou révèle un piège opérationnel — édition ciblée,
-   jamais une réécriture complète. Discipline de taille : pas plus d'une
+   jamais une réécriture complète. Discipline de taille : cible ≈ 6 Ko,
+   condensé à la livraison (`/livre`) si dépassée ; pas plus d'une
    poignée de pièges actifs à la fois ; un piège résolu ou devenu non
    pertinent se retire plutôt que de s'accumuler.
 
