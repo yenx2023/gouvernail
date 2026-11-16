@@ -1,6 +1,7 @@
 ---
 name: registre
 description: Consigne ou met à jour une divergence par rapport au produit tiers amont (personnalisation, correctif préservé, contournement) dans docs/REGISTRE.md, référencée par numéro d'issue GitLab plutôt que dupliquée. Profil produit-tiers de Gouvernail. Usage : /registre <numero-issue>
+model: sonnet
 ---
 
 # registre

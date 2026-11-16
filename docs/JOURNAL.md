@@ -334,3 +334,19 @@ inaccessibles depuis un projet. `/amorce-projet` copie aussi désormais
 `scripts/mesure-contexte.sh` et son test. 52 phrases d'origine vérifiées
 présentes dans la doctrine détaillée. Livré via Merge Request GitLab,
 mergée dans `main`.
+
+## 2026-11-16 — Issue #23 — `feature/23-subagents-modeles-par-tache`
+
+Ajoute le choix du modèle par tâche, d'après la documentation officielle de
+Claude Code : deux subagents `.claude/agents/` (`explorateur` en Haiku,
+lecture seule ; `executant` en Sonnet, pour appliquer une décision déjà
+prise) et `model: sonnet` (+ `effort: low` sur `/tache` et `/cloture`) sur
+les skills mécaniques `/tache`, `/livre`, `/cloture`, `/backlog-gitlab`,
+`/registre`, `/piege`. Pas de `model:` sur `/cadre`, `/planifie`,
+`/investigue`, `/absorbe` : l'override d'un skill ne vaut que pour le tour
+courant, inefficace sur un dialogue multi-tours (→ `opusplan` documenté dans
+le README). `tests/modeles.test.sh` (39 tests) valide le frontmatter, car
+Claude Code ignore sans erreur un champ mal formé, et interdit Haiku sur un
+skill qui écrit sur git/GitLab. `/amorce-projet` copie agents et test.
+Effet réel non mesuré en session (à vérifier avec `/cost`). Livré via Merge
+Request GitLab, mergée dans `main`.

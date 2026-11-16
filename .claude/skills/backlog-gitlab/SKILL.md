@@ -1,6 +1,7 @@
 ---
 name: backlog-gitlab
 description: Convertit un PRD/PLAN (issu de /cadre, /planifie ou équivalent) en Milestones et Issues GitLab via l'API GitLab (REST + GraphQL). Usage : /backlog-gitlab <chemin-vers-PRD-ou-PLAN>
+model: sonnet
 ---
 
 # backlog-gitlab

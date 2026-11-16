@@ -127,6 +127,43 @@ bash tests/gitlab-api.test.sh
 bash tests/mesure-contexte.test.sh
 ```
 
+Le frontmatter des subagents et des skills (`model:`, `effort:`, `name`,
+garde-fous) est validé par `tests/modeles.test.sh` :
+
+```
+bash tests/modeles.test.sh
+```
+
+## Choisir le modèle selon la tâche
+
+Trois mécanismes natifs de Claude Code, du plus automatique au plus manuel
+(champs vérifiés dans la documentation officielle) :
+
+| Mécanisme | Portée | Dans Gouvernail |
+|---|---|---|
+| `model:` (et `effort:`) dans le frontmatter d'un **skill** | le **tour courant** seulement — le modèle de la session reprend au prompt suivant | `sonnet` sur `/tache`, `/livre`, `/cloture`, `/backlog-gitlab`, `/registre`, `/piege` (tâches mécaniques en un tour) ; `effort: low` sur `/tache` et `/cloture` |
+| `model:` dans un **subagent** (`.claude/agents/*.md`) | toute la tâche déléguée ; seul le résumé revient dans la conversation | `explorateur` (**haiku**, lecture seule : recherche et exploration) et `executant` (**sonnet** : modification dont la décision est déjà prise) |
+| `/model` ou alias **`opusplan`** | toute la session | à choisir par l'utilisateur, voir ci-dessous |
+
+**Pourquoi pas de `model:` sur `/cadre`, `/planifie`, `/investigue`,
+`/absorbe`** : ce sont des dialogues en plusieurs tours, et l'override d'un
+skill ne vaut que pour le tour qui l'a invoqué — le modèle de session
+reprendrait dès votre réponse suivante. Pour ces tâches, c'est le modèle de
+session qui compte.
+
+**Réglage recommandé de la session** : `/model opusplan` — Opus en plan mode
+(cadrage, architecture, diagnostic), Sonnet pour l'exécution. Les skills
+mécaniques et les subagents ci-dessus abaissent ensuite le coût des étapes
+qui n'exigent pas de raisonnement. Haiku est réservé à la lecture seule
+(`explorateur`) : jamais sur un skill qui committe, pousse ou écrit sur
+GitLab (garde-fou vérifié par `tests/modeles.test.sh`).
+
+Limites : un champ de frontmatter mal formé est **ignoré sans erreur** par
+Claude Code (d'où `tests/modeles.test.sh`) ; ces champs `model:`/`effort:`
+sont propres à Claude Code (claude.ai et l'API n'acceptent qu'un jeu réduit
+de champs). L'économie réelle dépend des modèles disponibles sur votre
+abonnement (`availableModels`) — mesurez avec `/cost`.
+
 ## Mesurer le contexte chargé par session
 
 `scripts/mesure-contexte.sh [racine-du-depot]` affiche, pour un dépôt outillé

@@ -1,6 +1,8 @@
 ---
 name: cloture
 description: Ferme une issue GitLab en dehors du flux normal de merge — `/livre` (mode "merge") ferme déjà automatiquement l'issue et son milestone quand le merge explicite en confirme la livraison. Ce skill couvre les exceptions (décision sans code livré, doublon, rattrapage d'une clôture manquée), toujours sur invocation explicite. Usage : /cloture <numero-issue>
+model: sonnet
+effort: low
 ---
 
 # cloture
