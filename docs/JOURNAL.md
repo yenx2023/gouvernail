@@ -297,3 +297,14 @@ ECC (`affaan-m/ecc`, analysé en session) — explicitement marqué comme
 `/livre` au moment de la phrase de validation, est un préalable
 indispensable avant tout blocage strict, sous peine de bloquer aussi le
 push de continuité. Livré via MR GitLab !45, mergée dans `main`.
+
+## 2026-11-16 — Issue #18 — `chore/18-mesurer-contexte-session`
+
+Ajoute `scripts/mesure-contexte.sh` : mesure (octets, mots, tokens estimés
+≈ octets / 3,7) du contexte qu'une session charge dans un dépôt outillé
+Gouvernail — `CLAUDE.md` (toujours chargé), docs lus en début de session,
+autres docs, skills. Sert de référence avant/après pour les autres issues du
+milestone « Optimisation de la consommation de tokens ». Couvert par
+`tests/mesure-contexte.test.sh` (16 tests hors-ligne, validés sous bash 3.2
+macOS) ; usage documenté dans le README. Livré via Merge Request GitLab,
+mergée dans `main`.
