@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/aligne-gouvernail.sh\" audit --court 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

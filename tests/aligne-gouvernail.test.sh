@@ -90,6 +90,7 @@ source_outillee() {
   echo "agent v1" > "$1/.claude/agents/explorateur.md"
   echo "livre v1" > "$1/.claude/skills/livre/SKILL.md"
   echo "cadre v1" > "$1/.claude/skills/cadre/SKILL.md"
+  cp "$SCRIPT_DIR/.claude/settings.json" "$1/.claude/settings.json"
   git_quiet -C "$1" add -A && git_quiet -C "$1" commit -q -m "v1"
 }
 
@@ -100,6 +101,7 @@ projet_a_jour() {
   cp "$2/.claude/agents/explorateur.md" "$1/.claude/agents/"
   cp "$2/.claude/skills/livre/SKILL.md" "$1/.claude/skills/livre/"
   echo "Règle de lecture de début de session" > "$1/CLAUDE.md"
+  cp "$2/.claude/settings.json" "$1/.claude/settings.json"
   git -C "$2" rev-parse HEAD > "$1/.claude/gouvernail-version"
   printf '# Contexte\n' > "$1/docs/CONTEXT.md"
   printf '# Journal\n\n## 2026-01-01 — Issue #1\n\ntexte\n' > "$1/docs/JOURNAL.md"
@@ -316,6 +318,77 @@ printf '# Journal\n\n## 2026-01-01 — Issue #1\n' > "$WORK/d2/docs/JOURNAL.md"
 assert_status 1 $? "échoue si scripts/archive-journal.sh est absent du projet"
 "$ALIGNE" --racine "$WORK/d2" donnees --bidon >/dev/null 2>&1
 assert_status 1 $? "refuse une option inconnue"
+
+# ---------------------------------------------------------------------------
+# hook SessionStart
+# ---------------------------------------------------------------------------
+
+echo "== hook : settings.json de Gouvernail =="
+SETTINGS="$SCRIPT_DIR/.claude/settings.json"
+if command -v python3 >/dev/null 2>&1; then
+  python3 -I -c 'import json,sys; json.load(open(sys.argv[1]))' "$SETTINGS"
+  assert_status 0 $? "settings.json est un JSON valide"
+  HOOK_CMD="$(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d["hooks"]["SessionStart"][0]["hooks"][0]["command"])' "$SETTINGS")"
+  HOOK_MATCHER="$(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d["hooks"]["SessionStart"][0]["matcher"])' "$SETTINGS")"
+  assert_eq "startup" "$HOOK_MATCHER" "le hook ne se déclenche qu'au démarrage (pas à chaque compactage)"
+  assert_contains "$HOOK_CMD" "audit --court" "le hook lance l'audit court"
+  assert_contains "$HOOK_CMD" "|| true" "le hook ne bloque jamais le démarrage de session"
+
+  # exécute la commande exacte du hook dans un projet factice
+  lancer_hook() { CLAUDE_PROJECT_DIR="$1" bash -c "$HOOK_CMD"; }
+
+  echo "== hook : une ligne ou rien =="
+  source_outillee "$WORK/s4"
+  projet_a_jour "$WORK/h1" "$WORK/s4"
+  mkdir -p "$WORK/h1/scripts" && cp "$ALIGNE" "$WORK/h1/scripts/"
+  OUT="$(GOUVERNAIL_SOURCE="$WORK/s4" lancer_hook "$WORK/h1")"
+  assert_eq "" "$OUT" "silence quand le projet est à jour"
+  head -c 6500 /dev/zero | tr '\0' 'a' > "$WORK/h1/docs/CONTEXT.md"
+  OUT="$(GOUVERNAIL_SOURCE="$WORK/s4" lancer_hook "$WORK/h1")"
+  assert_eq "1" "$(printf '%s\n' "$OUT" | grep -c .)" "une seule ligne quand il y a quelque chose à faire"
+  assert_contains "$OUT" "lance /aligne" "la ligne oriente vers /aligne"
+
+  echo "== hook : jamais bloquant =="
+  mkdir -p "$WORK/h2"
+  OUT="$(lancer_hook "$WORK/h2" 2>&1)"
+  assert_status 0 $? "code 0 si le script est absent du projet"
+  assert_eq "" "$OUT" "aucune erreur affichée si le script est absent"
+  mkdir -p "$WORK/h3/scripts"; cp "$ALIGNE" "$WORK/h3/scripts/"
+  OUT="$(lancer_hook "$WORK/h3" 2>&1)"
+  assert_status 0 $? "code 0 si le projet n'est pas un dépôt Gouvernail valide"
+else
+  echo "  (python3 absent : tests du hook ignorés)"
+fi
+
+echo "== audit : hook absent =="
+projet_a_jour "$WORK/h4" "$WORK/s4"
+rm "$WORK/h4/.claude/settings.json"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s4" "$ALIGNE" --racine "$WORK/h4" audit)"
+assert_contains "$OUT" "hook SessionStart d'audit absent" "signale l'absence du hook"
+echo '{"model": "sonnet"}' > "$WORK/h4/.claude/settings.json"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s4" "$ALIGNE" --racine "$WORK/h4" audit)"
+assert_contains "$OUT" "hook SessionStart d'audit absent" "des réglages sans le hook sont signalés aussi"
+
+echo "== audit : la source n'a pas de marqueur à porter =="
+projet_a_jour "$WORK/h7" "$WORK/s4"
+rm "$WORK/h7/.claude/gouvernail-version"
+mkdir -p "$WORK/h7/.claude/skills/amorce-projet"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s4" "$ALIGNE" --racine "$WORK/h7" audit)"
+assert_not_contains "$OUT" "gouvernail-version absent" "pas de marqueur exigé de Gouvernail lui-même"
+
+echo "== outillage : settings.json =="
+projet_a_jour "$WORK/h5" "$WORK/s4"
+rm "$WORK/h5/.claude/settings.json"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s4" "$ALIGNE" --racine "$WORK/h5" outillage)"
+assert_contains "$OUT" "ajouté : .claude/settings.json" "ajoute settings.json s'il est absent"
+assert_contains "$(cat "$WORK/h5/.claude/settings.json")" "audit --court" "settings.json copié avec le hook"
+
+projet_a_jour "$WORK/h6" "$WORK/s4"
+echo '{"model": "sonnet"}' > "$WORK/h6/.claude/settings.json"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s4" "$ALIGNE" --racine "$WORK/h6" outillage)"
+assert_eq '{"model": "sonnet"}' "$(cat "$WORK/h6/.claude/settings.json")" "ne touche pas aux réglages existants du projet"
+assert_contains "$OUT" "À AJOUTER À LA MAIN" "demande d'ajouter le hook à la main"
+assert_contains "$OUT" "audit --court" "affiche le hook à ajouter"
 
 echo
 echo "$TESTS_RUN tests, $TESTS_FAILED échec(s)"

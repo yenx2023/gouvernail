@@ -33,6 +33,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MARQUEUR_REL=".claude/gouvernail-version"
+SETTINGS_REL=".claude/settings.json"
 GOUVERNAIL_REPO_URL="${GOUVERNAIL_REPO_URL:-https://github.com/yenx2023/gouvernail}"
 
 # Seuils d'optimisation (voir CLAUDE.md > Mémoire de session)
@@ -173,7 +174,13 @@ cmd_audit() {
     findings=$((findings + 1))
     lines+=("CLAUDE.md : règle de lecture de début de session absente — à reporter (CLAUDE.md > Mémoire de session de Gouvernail)")
   fi
-  if ! [ -f "$ROOT/$MARQUEUR_REL" ]; then
+  if ! grep -qs "aligne-gouvernail" "$ROOT/$SETTINGS_REL"; then
+    findings=$((findings + 1))
+    lines+=("$SETTINGS_REL : hook SessionStart d'audit absent — l'audit au démarrage n'est pas actif (scripts/aligne-gouvernail.sh outillage)")
+  fi
+  # Gouvernail lui-même (reconnu à /amorce-projet, jamais copié dans un projet)
+  # est la source : il n'a pas de marqueur de version à porter.
+  if ! [ -f "$ROOT/$MARQUEUR_REL" ] && ! [ -d "$ROOT/.claude/skills/amorce-projet" ]; then
     findings=$((findings + 1))
     lines+=("$MARQUEUR_REL absent — version de Gouvernail inconnue (scripts/aligne-gouvernail.sh marqueur ecrire)")
   fi
@@ -269,6 +276,23 @@ cmd_outillage() {
         diff -u --label "projet:$rel" --label "gouvernail:$rel" "$ROOT/$rel" "$SOURCE/$rel" | head -40 || true ;;
     esac
   done < <(liste_outillage)
+
+  # Hook d'audit au démarrage : .claude/settings.json n'est pas un simple
+  # fichier mécanique (le projet y met ses propres réglages) — copié s'il
+  # est absent, sinon le hook est proposé à ajouter à la main.
+  if [ -f "$SOURCE/$SETTINGS_REL" ]; then
+    if [ ! -f "$ROOT/$SETTINGS_REL" ]; then
+      echo "  ajouté : $SETTINGS_REL (hook SessionStart d'audit)"
+      copies=$((copies + 1))
+      if [ "$simule" = "non" ]; then
+        mkdir -p "$ROOT/.claude"
+        cp -p "$SOURCE/$SETTINGS_REL" "$ROOT/$SETTINGS_REL"
+      fi
+    elif ! grep -qs "aligne-gouvernail" "$ROOT/$SETTINGS_REL"; then
+      echo "  À AJOUTER À LA MAIN dans $SETTINGS_REL (le projet a déjà ses réglages, rien n'est fusionné automatiquement) :"
+      sed 's/^/      /' "$SOURCE/$SETTINGS_REL"
+    fi
+  fi
 
   echo "Outillage : $copies ajouté(s), $maj mis à jour, $gardes conservé(s)."
   [ "$gardes" -eq 0 ] || echo "Les fichiers conservés se comparent et se fusionnent à la main (skill /aligne)."
