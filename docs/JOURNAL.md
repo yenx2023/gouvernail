@@ -29,19 +29,6 @@ création du fichier vide à l'amorçage dans `amorce-projet` (symétrique à
 `docs/REGISTRE.md`/skill `/piege` avant cette remontée. Livré via MR
 GitLab !41, mergée dans `main`.
 
-## 2026-07-29 — Issue #10 — `chore/10-limite-verification-visuelle-cloud`
-
-Retour d'expérience `taga-mobile-app` : Claude Code Cloud (sandbox web
-utilisé pour ces sessions) n'a ni écran ni émulateur/simulateur, et ses
-restrictions réseau bloquent en général les tunnels de dev interactif
-(ex. tunnel Expo/Metro). Il peut écrire du code, exécuter des tests
-automatisés (sans rendu réel) et ouvrir des Merge Requests, mais jamais
-afficher un rendu visuel ni piloter une session interactive. Ajoute ce
-garde-fou à `CLAUDE.md.template` > Tests pour que tout nouveau projet à
-surface visuelle significative (frontend web, mobile) en hérite dès
-l'amorçage, plutôt que de le redécouvrir projet par projet. Livré via MR
-GitLab !35, mergée dans `main`.
-
 ## 2026-08-11 — Issue #11 — chore/11-langue-travail-claude
 
 Ajoute une section "Langue de travail" au `CLAUDE.md` de Gouvernail et au
@@ -204,3 +191,16 @@ gates humains : outil externe non vendorisé, jamais installé par
 `/amorce-projet`. Les alias ne fixent le modèle qu'au lancement ; le routage
 par tâche reste assuré par les skills et subagents. Documentation seule, aucun
 test ajouté. Livré via Merge Request GitLab, mergée dans `main`.
+
+## 2026-11-16 — Issue #25 — `chore/25-procedure-portage-depot-existant`
+
+Ajoute dans `CLAUDE.md` (« Adopter Gouvernail sur un dépôt existant ») une
+checklist de portage d'une évolution du framework vers un dépôt déjà outillé :
+mesurer avant, comparer avant de copier, reporter `CLAUDE.md` section par
+section sans écraser le propre au projet (zéro perte vers `docs/DOCTRINE.md`),
+appliquer les règles aux données du projet (`CONTEXT`, `JOURNAL`, `DESIGN`),
+tests, mesurer après. Une issue et une MR par dépôt. Documentation seule, aucun
+test ajouté. Dernière issue du milestone « Optimisation de la consommation de
+tokens » ; le portage effectif dans `taga-mobile-app` et `taga-backend` reste à
+faire, dans leurs propres backlogs. Livré via Merge Request GitLab, mergée dans
+`main`.

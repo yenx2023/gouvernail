@@ -159,6 +159,44 @@ questions qu'`/amorce-projet` poserait pour un projet neuf (voir Étape 1 de
 - sous-groupe produit s'il y a plusieurs dépôts pour le même produit tiers
   (voir Produit multi-dépôts ci-dessus).
 
+#### Checklist de portage d'une évolution du framework vers un dépôt existant
+
+Quand le framework gagne une amélioration (ex. les optimisations de contexte
+du milestone « Optimisation de la consommation de tokens »), chaque dépôt déjà
+outillé la reçoit **à la main**, dans cet ordre. Une issue et **une MR par
+dépôt** (jamais un portage groupé), branche créée via `/tache` ; les
+décisions de profil, régime et sous-groupe ci-dessus ne se recopient pas d'un
+dépôt frère.
+
+1. **Mesurer avant.** Copier `scripts/mesure-contexte.sh` depuis Gouvernail,
+   le lancer sur le dépôt cible et noter les chiffres dans l'issue (ils
+   servent de référence pour l'étape 7).
+2. **Comparer avant de copier.** `diff -r` entre l'outillage de Gouvernail et
+   celui du dépôt : une copie locale (`scripts/gitlab-api.sh`, un skill) peut
+   avoir divergé volontairement — ne jamais écraser à l'aveugle. À reporter :
+   `scripts/` (`mesure-contexte.sh`, `archive-journal.sh`) et leurs
+   `tests/`, `.claude/agents/`, les skills modifiés. Jamais `amorce-projet/`,
+   ni les skills de l'autre profil.
+3. **Reporter `CLAUDE.md` section par section, sans le remplacer par le
+   gabarit.** Reprendre les sections génériques (Mémoire de session et règle
+   de lecture, règles courtes renvoyant à `docs/DOCTRINE.md`) et **conserver
+   tout ce qui est propre au projet** (stack, outillage spécifique, design,
+   vérification visuelle…). Créer `docs/DOCTRINE.md` depuis
+   `references/doctrine-technique.md`, et ne retirer du `CLAUDE.md` le détail
+   déplacé qu'après avoir vérifié que chaque règle se retrouve dans l'un des
+   deux fichiers (zéro perte, un état un seul endroit). Attention aux outils
+   qui régénèrent `CLAUDE.md` (ex. Laravel Boost) : relire leur diff.
+4. **Appliquer les règles aux données du projet.** `docs/CONTEXT.md` au-delà
+   de ≈ 6 Ko : le condenser ; `docs/JOURNAL.md` : `scripts/archive-journal.sh` ;
+   `docs/DESIGN.md` monolithique : option **migrer** de `/design` (déplacement
+   à l'identique, contrôle de perte zéro avant toute suppression).
+5. **Mettre à jour la documentation vivante** du dépôt (README, PLAN, PRD) si
+   le portage change un état documenté.
+6. **Lancer les tests** : `tests/*.test.sh` copiés, plus la suite propre du
+   dépôt — elle ne doit pas régresser.
+7. **Mesurer après** avec `scripts/mesure-contexte.sh` et reporter
+   avant/après dans la description de la MR.
+
 Retour d'expérience à l'origine de cette section : sur un produit à trois
 dépôts (un backend + deux apps mobiles), le backend a adopté Gouvernail en
 régime `déployé` — correct, il a de vrais environnements test/production.
