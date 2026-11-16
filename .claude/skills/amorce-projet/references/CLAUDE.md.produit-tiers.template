@@ -223,6 +223,10 @@ ajoute de son côté). Vérifier au minimum qu'elle est activement maintenue.
   recherche ou par section — jamais en entier par défaut (exceptions
   ci-dessous pour `docs/REGISTRE.md`). Mesurer l'effet avec
   `scripts/mesure-contexte.sh`.
+- **Alignement sur Gouvernail** : si le démarrage de session signale des
+  optimisations disponibles (hook `SessionStart`, une ligne), lancer `/aligne`
+  depuis une branche de tâche — phases validées, jamais de commit ; la
+  livraison passe par `/livre`. Rien d'autre à lire pour cela.
 - `docs/REGISTRE.md` : état courant des divergences par rapport à l'amont —
   toujours le lire avant toute tâche touchant du code personnalisé, et
   systématiquement avant une absorption de version (`/absorbe`).

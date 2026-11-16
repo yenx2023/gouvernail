@@ -301,6 +301,8 @@ vérification avant/après. Il se lance depuis une branche de tâche
 - `CLAUDE.md` — doctrine complète : ce que Claude ne doit jamais faire seul,
   convention de nommage des branches, sécurité du token, répartition
   REST/GraphQL vérifiée en conditions réelles.
+- `docs/archive/` — entrées anciennes du journal, archivées par
+  `scripts/archive-journal.sh` (à interroger par `grep`).
 - `docs/JOURNAL.md` — journal chronologique des tâches livrées sur ce
   dépôt (les plus anciennes entrées sont dans `docs/archive/`), à consulter
   par recherche plutôt qu'en entier.
