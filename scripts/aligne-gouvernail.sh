@@ -16,6 +16,14 @@
 #                      retard. Code retour 1 s'il y a quelque chose à faire.
 #   audit --court      une seule ligne s'il y a quelque chose à faire, rien
 #                      sinon, jamais d'accès réseau (pour un hook de démarrage)
+#   outillage [--simule]  copie l'outillage mécanique manquant ou périmé. Une
+#                      copie MODIFIÉE localement (ou sans base de comparaison)
+#                      n'est jamais écrasée : son diff est affiché.
+#   donnees [--simule]    archive les entrées anciennes du journal
+#                      (scripts/archive-journal.sh)
+#
+# Ces commandes ne modifient que l'arbre de travail : jamais de commit, jamais
+# de push (la livraison passe par /livre). --simule n'écrit rien.
 #
 # Source de Gouvernail : variable GOUVERNAIL_SOURCE (défaut : dépôt voisin
 # ../gouvernail) ; à défaut, clone temporaire de GOUVERNAIL_REPO_URL (par
@@ -228,6 +236,63 @@ cmd_audit() {
   return 1
 }
 
+# outillage [--simule]
+cmd_outillage() {
+  local simule="non" rel st copies=0 maj=0 gardes=0 verbe
+  case "${1:-}" in
+    --simule) simule="oui" ;;
+    '') ;;
+    *) usage; die "outillage : option inconnue '$1'" ;;
+  esac
+  resolve_source reseau || die "source Gouvernail introuvable (GOUVERNAIL_SOURCE='${GOUVERNAIL_SOURCE:-$ROOT/../gouvernail}', clone de $GOUVERNAIL_REPO_URL impossible)"
+  [ "$SOURCE" != "$ROOT" ] || die "ce dépôt est la source Gouvernail : rien à aligner"
+  [ "$simule" = "non" ] || echo "(simulation : aucun fichier écrit)"
+
+  while IFS= read -r rel; do
+    [ -n "$rel" ] || continue
+    st="$(statut_fichier "$rel")"
+    case "$st" in
+      manquant|perime)
+        [ "$st" = "manquant" ] && { verbe="ajouté"; copies=$((copies + 1)); } || { verbe="mis à jour"; maj=$((maj + 1)); }
+        echo "  $verbe : $rel"
+        if [ "$simule" = "non" ]; then
+          mkdir -p "$(dirname "$ROOT/$rel")"
+          cp -p "$SOURCE/$rel" "$ROOT/$rel"
+        fi ;;
+      modifie|different)
+        gardes=$((gardes + 1))
+        if [ "$st" = "modifie" ]; then
+          echo "  CONSERVÉ (modifié localement) : $rel"
+        else
+          echo "  CONSERVÉ (diffère de la source, pas de marqueur pour trancher) : $rel"
+        fi
+        diff -u --label "projet:$rel" --label "gouvernail:$rel" "$ROOT/$rel" "$SOURCE/$rel" | head -40 || true ;;
+    esac
+  done < <(liste_outillage)
+
+  echo "Outillage : $copies ajouté(s), $maj mis à jour, $gardes conservé(s)."
+  [ "$gardes" -eq 0 ] || echo "Les fichiers conservés se comparent et se fusionnent à la main (skill /aligne)."
+  return 0
+}
+
+# donnees [--simule]
+cmd_donnees() {
+  local simule="non" journal="$ROOT/docs/JOURNAL.md" archiveur="$ROOT/scripts/archive-journal.sh" n
+  case "${1:-}" in
+    --simule) simule="oui" ;;
+    '') ;;
+    *) usage; die "donnees : option inconnue '$1'" ;;
+  esac
+  [ -f "$journal" ] || { echo "Pas de docs/JOURNAL.md : rien à archiver."; return 0; }
+  [ -f "$archiveur" ] || die "scripts/archive-journal.sh absent — lancer d'abord : scripts/aligne-gouvernail.sh outillage"
+  if [ "$simule" = "oui" ]; then
+    n=$(grep -c '^## [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' "$journal" || true)
+    echo "(simulation) journal : $n entrée(s), seuil $JOURNAL_MAX_ENTREES — rien n'est écrit."
+    return 0
+  fi
+  bash "$archiveur" "$journal"
+}
+
 cmd_marqueur() {
   case "${1:-}" in
     lire)   lire_marqueur ;;
@@ -245,6 +310,8 @@ fi
 case "${1:-}" in
   marqueur) shift; cmd_marqueur "$@" ;;
   audit) shift; cmd_audit "$@" ;;
+  outillage) shift; cmd_outillage "$@" ;;
+  donnees) shift; cmd_donnees "$@" ;;
   -h|--help|'') usage ;;
   *) usage; die "commande inconnue : $1" ;;
 esac

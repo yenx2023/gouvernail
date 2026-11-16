@@ -217,6 +217,106 @@ assert_contains "$OUT" "outillage manquant" "l'audit complet clone la source si 
 OUT="$(GOUVERNAIL_SOURCE="$WORK/nulle-part" GOUVERNAIL_REPO_URL="$WORK/s2" "$ALIGNE" --racine "$WORK/c2" audit --court)"
 assert_eq "" "$OUT" "--court ne clone jamais la source"
 
+# ---------------------------------------------------------------------------
+# outillage
+# ---------------------------------------------------------------------------
+
+echo "== outillage : ajoute le manquant, met à jour le périmé =="
+source_outillee "$WORK/s3"
+chmod +x "$WORK/s3/scripts/mesure-contexte.sh"
+git_quiet -C "$WORK/s3" add -A && git_quiet -C "$WORK/s3" commit -q -m "exec"
+projet_a_jour "$WORK/o1" "$WORK/s3"
+git -C "$WORK/o1" init -q && git_quiet -C "$WORK/o1" add -A && git_quiet -C "$WORK/o1" commit -q -m "base"
+rm "$WORK/o1/.claude/agents/explorateur.md"
+O1V1="$(git -C "$WORK/s3" rev-parse HEAD)"
+echo "mesure v3" > "$WORK/s3/scripts/mesure-contexte.sh"
+git_quiet -C "$WORK/s3" commit -q -am "v3"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/o1" outillage)"
+assert_status 0 $? "réussit"
+assert_contains "$OUT" "ajouté : .claude/agents/explorateur.md" "ajoute le fichier manquant"
+assert_eq "agent v1" "$(cat "$WORK/o1/.claude/agents/explorateur.md")" "le fichier manquant est copié"
+assert_contains "$OUT" "mis à jour : scripts/mesure-contexte.sh" "met à jour le fichier périmé"
+assert_eq "mesure v3" "$(cat "$WORK/o1/scripts/mesure-contexte.sh")" "le fichier périmé prend la version de la source"
+assert_contains "$OUT" "1 ajouté(s), 1 mis à jour, 0 conservé(s)" "résume l'opération"
+
+echo "== outillage : ne committe jamais =="
+assert_eq "1" "$(git -C "$WORK/o1" log --oneline | wc -l | tr -d ' ')" "aucun commit créé dans le projet"
+[ -n "$(git -C "$WORK/o1" status --porcelain)" ] && pass "les changements restent dans l'arbre de travail" || fail "aucun changement dans l'arbre de travail"
+
+echo "== outillage : idempotent =="
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/o1" outillage)"
+assert_contains "$OUT" "0 ajouté(s), 0 mis à jour, 0 conservé(s)" "un second passage ne change rien"
+
+echo "== outillage : préserve le bit exécutable =="
+rm "$WORK/o1/scripts/mesure-contexte.sh"
+GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/o1" outillage >/dev/null
+[ -x "$WORK/o1/scripts/mesure-contexte.sh" ] && pass "le script copié reste exécutable" || fail "bit exécutable perdu"
+
+echo "== outillage : n'écrase jamais une copie modifiée localement =="
+projet_a_jour "$WORK/o2" "$WORK/s3"
+echo "$O1V1" > "$WORK/o2/.claude/gouvernail-version"
+echo "mesure v1" > "$WORK/o2/scripts/mesure-contexte.sh"   # copie d'origine (v1) : périmée
+echo "livre modifié par le projet" > "$WORK/o2/.claude/skills/livre/SKILL.md"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/o2" outillage)"
+assert_contains "$OUT" "CONSERVÉ (modifié localement) : .claude/skills/livre/SKILL.md" "signale la copie modifiée localement"
+assert_eq "livre modifié par le projet" "$(cat "$WORK/o2/.claude/skills/livre/SKILL.md")" "la copie modifiée n'est pas écrasée"
+assert_contains "$OUT" "-livre modifié par le projet" "affiche le diff projet/gouvernail"
+assert_eq "mesure v3" "$(cat "$WORK/o2/scripts/mesure-contexte.sh")" "la copie d'origine, elle, est mise à jour"
+
+echo "== outillage : sans marqueur, une différence n'est pas écrasée =="
+projet_a_jour "$WORK/o3" "$WORK/s3"
+rm "$WORK/o3/.claude/gouvernail-version"
+echo "divergent" > "$WORK/o3/scripts/mesure-contexte.sh"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/o3" outillage)"
+assert_contains "$OUT" "CONSERVÉ (diffère de la source" "signale la différence sans base de comparaison"
+assert_eq "divergent" "$(cat "$WORK/o3/scripts/mesure-contexte.sh")" "n'écrase pas sans base de comparaison"
+
+echo "== outillage --simule =="
+projet_a_jour "$WORK/o4" "$WORK/s3"
+rm "$WORK/o4/.claude/agents/explorateur.md"
+AVANT="$(snapshot "$WORK/o4")"
+OUT="$(GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/o4" outillage --simule)"
+assert_contains "$OUT" "simulation" "annonce la simulation"
+assert_contains "$OUT" "ajouté : .claude/agents/explorateur.md" "décrit ce qui serait fait"
+assert_eq "$AVANT" "$(snapshot "$WORK/o4")" "n'écrit rien en simulation"
+
+echo "== outillage : erreurs =="
+GOUVERNAIL_SOURCE="$WORK/nulle-part" "$ALIGNE" --racine "$WORK/o4" outillage >/dev/null 2>&1
+assert_status 1 $? "échoue si la source est introuvable"
+GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/s3" outillage >/dev/null 2>&1
+assert_status 1 $? "refuse d'aligner la source sur elle-même"
+GOUVERNAIL_SOURCE="$WORK/s3" "$ALIGNE" --racine "$WORK/o4" outillage --bidon >/dev/null 2>&1
+assert_status 1 $? "refuse une option inconnue"
+
+# ---------------------------------------------------------------------------
+# donnees
+# ---------------------------------------------------------------------------
+
+echo "== donnees : archive le journal =="
+mkdir -p "$WORK/d1/scripts" "$WORK/d1/docs" "$WORK/d1/.claude"
+echo "x" > "$WORK/d1/CLAUDE.md"
+cp "$SCRIPT_DIR/scripts/archive-journal.sh" "$WORK/d1/scripts/"
+printf '# Journal\n' > "$WORK/d1/docs/JOURNAL.md"
+for i in $(seq 1 20); do printf '\n## 2026-03-%02d — Issue #%d\n\ntexte\n' "$i" "$i" >> "$WORK/d1/docs/JOURNAL.md"; done
+AVANT="$(snapshot "$WORK/d1")"
+OUT="$("$ALIGNE" --racine "$WORK/d1" donnees --simule)"
+assert_contains "$OUT" "20 entrée(s)" "la simulation compte les entrées"
+assert_eq "$AVANT" "$(snapshot "$WORK/d1")" "la simulation n'écrit rien"
+"$ALIGNE" --racine "$WORK/d1" donnees >/dev/null
+assert_status 0 $? "archive le journal"
+assert_eq "15" "$(grep -c '^## 2026' "$WORK/d1/docs/JOURNAL.md")" "garde 15 entrées dans le journal"
+assert_eq "5" "$(grep -c '^## 2026' "$WORK/d1/docs/archive/JOURNAL-2026.md")" "archive les 5 plus anciennes"
+
+echo "== donnees : cas limites =="
+mkdir -p "$WORK/d2/docs"; echo "x" > "$WORK/d2/CLAUDE.md"
+OUT="$("$ALIGNE" --racine "$WORK/d2" donnees)"
+assert_contains "$OUT" "Pas de docs/JOURNAL.md" "journal absent : rien à faire, sans erreur"
+printf '# Journal\n\n## 2026-01-01 — Issue #1\n' > "$WORK/d2/docs/JOURNAL.md"
+"$ALIGNE" --racine "$WORK/d2" donnees >/dev/null 2>&1
+assert_status 1 $? "échoue si scripts/archive-journal.sh est absent du projet"
+"$ALIGNE" --racine "$WORK/d2" donnees --bidon >/dev/null 2>&1
+assert_status 1 $? "refuse une option inconnue"
+
 echo
 echo "$TESTS_RUN tests, $TESTS_FAILED échec(s)"
 [ "$TESTS_FAILED" -eq 0 ]
