@@ -120,6 +120,28 @@ mockés, aucun appel réseau) :
 bash tests/gitlab-api.test.sh
 ```
 
+`scripts/mesure-contexte.sh` est couvert par `tests/mesure-contexte.test.sh`
+(dépôt factice, aucun appel réseau) :
+
+```
+bash tests/mesure-contexte.test.sh
+```
+
+## Mesurer le contexte chargé par session
+
+`scripts/mesure-contexte.sh [racine-du-depot]` affiche, pour un dépôt outillé
+Gouvernail, la taille (octets, mots, tokens estimés à ≈ octets / 3,7) de ce
+qu'une session charge : `CLAUDE.md` (relu à chaque tour), les docs lus en
+début de session (`CONTEXT`, `JOURNAL`, `PRD`, `PLAN`, `DESIGN`), les autres
+`docs/*.md` et les `SKILL.md` (chargés à l'invocation). À lancer avant et
+après une optimisation de contexte pour en chiffrer le gain — l'estimation
+est un ordre de grandeur, pas un décompte exact du tokenizer.
+
+```
+scripts/mesure-contexte.sh                      # ce dépôt
+scripts/mesure-contexte.sh ../taga-mobile-app   # un projet frère
+```
+
 ## Aller plus loin
 
 - `CLAUDE.md` — doctrine complète : ce que Claude ne doit jamais faire seul,
