@@ -259,6 +259,23 @@ scripts/aligne-gouvernail.sh audit
 scripts/aligne-gouvernail.sh audit --court
 ```
 
+Deux commandes appliquent la partie **mécanique** de l'alignement, toujours
+dans l'arbre de travail seulement (jamais de commit ni de push — la livraison
+passe par `/livre`) ; `--simule` n'écrit rien :
+
+- `outillage` ajoute l'outillage manquant et met à jour celui qui est resté
+  identique à la copie d'origine. Une copie **modifiée localement**, ou qui
+  diffère sans marqueur pour trancher, n'est **jamais écrasée** : son diff
+  est affiché pour être fusionné à la main (`/aligne`).
+- `donnees` archive les entrées anciennes du journal
+  (`scripts/archive-journal.sh`).
+
+```
+scripts/aligne-gouvernail.sh outillage --simule
+scripts/aligne-gouvernail.sh outillage
+scripts/aligne-gouvernail.sh donnees
+```
+
 Le script ne committe ni ne pousse jamais : la livraison d'un alignement
 passe par `/livre` (branche + Merge Request).
 
