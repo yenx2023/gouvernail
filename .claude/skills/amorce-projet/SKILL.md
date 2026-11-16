@@ -158,10 +158,13 @@ divergent trop pour deviner.
      `.claude/skills/planifie/`.
    - **Si profil `produit-tiers`** : ajouter `.claude/skills/absorbe/`,
      `.claude/skills/registre/`, `.claude/skills/piege/`.
+   - `.claude/agents/` (subagents `explorateur` en Haiku et `executant` en
+     Sonnet — voir README > Choisir le modèle selon la tâche)
    - `scripts/gitlab-api.sh`
    - `scripts/mesure-contexte.sh`
    - `tests/gitlab-api.test.sh`
    - `tests/mesure-contexte.test.sh`
+   - `tests/modeles.test.sh`
    - `.env.example`
    - `docs/DOCTRINE.md` ← `references/doctrine-technique.md` (détail des
      principes techniques — SOLID, Tests, Documentation vivante, logging —

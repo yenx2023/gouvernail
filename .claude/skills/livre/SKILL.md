@@ -1,6 +1,7 @@
 ---
 name: livre
 description: Déclenche le vrai gate de validation GitLab Flow — commit, push (GitHub + GitLab), ouverture puis (sur demande explicite) merge d'une Merge Request GitLab. Usage explicite `/livre` (mode `revue` ou `merge`), ou déclenché automatiquement dès que l'utilisateur dit "tu peux commiter" / "tu peux commiter et merger" dans la conversation.
+model: sonnet
 ---
 
 # livre

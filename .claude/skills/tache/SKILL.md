@@ -1,6 +1,8 @@
 ---
 name: tache
 description: Démarre le cycle de vie d'une tâche à partir d'une issue GitLab existante — lit l'issue via l'API et crée la branche GitHub correspondante selon la convention du projet. Usage : /tache <numero-issue> [--projet <groupe>/<projet>]
+model: sonnet
+effort: low
 ---
 
 # tache

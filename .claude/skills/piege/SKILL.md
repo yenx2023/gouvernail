@@ -1,6 +1,7 @@
 ---
 name: piege
 description: Capitalise un piège rencontré pendant l'absorption d'une version du produit tiers amont (symptôme, cause, solution) dans la base de pièges du skill produit dédié de ce projet. Profil produit-tiers de Gouvernail. Usage : /piege, ou dès qu'un piège vient d'être résolu pendant une session (contournement non évident, erreur inattendue après montée de version).
+model: sonnet
 ---
 
 # piege
