@@ -163,9 +163,11 @@ divergent trop pour deviner.
    - `scripts/gitlab-api.sh`
    - `scripts/mesure-contexte.sh`
    - `scripts/archive-journal.sh`
+   - `scripts/aligne-gouvernail.sh`
    - `tests/gitlab-api.test.sh`
    - `tests/mesure-contexte.test.sh`
    - `tests/archive-journal.test.sh`
+   - `tests/aligne-gouvernail.test.sh`
    - `tests/modeles.test.sh`
    - `.env.example`
    - `docs/DOCTRINE.md` ← `references/doctrine-technique.md` (détail des
@@ -174,6 +176,12 @@ divergent trop pour deviner.
      et y renvoie, quel que soit le profil)
    - `.gitignore`
    - **Jamais** `amorce-projet/` lui-même, quel que soit le profil.
+   - **Marqueur de version** : une fois la copie faite, enregistrer la version
+     de Gouvernail dont l'outillage vient d'être copié :
+     `GOUVERNAIL_SOURCE=<chemin de Gouvernail> scripts/aligne-gouvernail.sh
+     --racine <cible> marqueur ecrire` (crée `.claude/gouvernail-version`,
+     point de départ des futurs alignements — voir README > Aligner un projet
+     sur Gouvernail).
 
 7. **Générer `CLAUDE.md`** dans la cible :
    - **Profil `conception`** : depuis
