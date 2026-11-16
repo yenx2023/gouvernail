@@ -202,3 +202,85 @@ surface visuelle significative (frontend web, mobile) en hérite dès
 l'amorçage, plutôt que de le redécouvrir projet par projet. Livré via MR
 GitLab !35, mergée dans `main`.
 
+## 2026-09-19 — Issue #15 — `chore/15-context-produit-tiers`
+
+Étend `docs/CONTEXT.md` (issue #14) au profil `produit-tiers` : le
+fichier se crée désormais quel que soit le profil dans `amorce-projet`.
+Son rôle (état courant + pièges généraux + décisions en attente) est
+orthogonal à `docs/REGISTRE.md` (divergences de code par rapport à
+l'amont) et à la base de pièges du skill `/piege` (pièges spécifiques à
+l'absorption d'une version) — vérifié avant l'extension, pas supposé.
+Frontière rendue explicite à deux endroits (le fichier généré lui-même
+pour ce profil, et l'étape correspondante du skill `/livre`) plutôt que
+de compter sur la mémoire de la session qui le remplira plus tard. Livré
+via MR GitLab !42, mergée dans `main`.
+
+## 2026-09-19 — Issue #14 — `chore/14-memoire-vivante-contexte`
+
+Remonte le patron `docs/CONTEXT.md` (résumé vivant, édité en place, de
+l'état opérationnel courant) validé sur `taga-backend`#95/
+`taga-mobile-app`#90, profil `conception` uniquement : puce dans
+`CLAUDE.md.template` > Mémoire de session (lue avant `docs/JOURNAL.md`),
+étape de maintenance dans le skill `/livre` (mode merge, conditionnée à
+l'existence du fichier — socle commun, sans effet en `produit-tiers`),
+création du fichier vide à l'amorçage dans `amorce-projet` (symétrique à
+`docs/REGISTRE.md` côté `produit-tiers`). Vérifié sans chevauchement avec
+`docs/REGISTRE.md`/skill `/piege` avant cette remontée. Livré via MR
+GitLab !41, mergée dans `main`.
+
+## 2026-08-11 — Issue #11 — chore/11-langue-travail-claude
+
+Ajoute une section "Langue de travail" au `CLAUDE.md` de Gouvernail et au
+gabarit `CLAUDE.md.template` (`/amorce-projet`) : aucun des deux ne
+précisait explicitement la langue de réponse de Claude Code (distincte
+d'une éventuelle exigence de langue sur le contenu applicatif), obligeant
+l'utilisateur à le rappeler à chaque nouvelle session — y compris sur les
+projets amorcés depuis ce framework. Retour d'expérience remonté depuis
+`taga-backend` et `taga-mobile-app`, corrigés de la même façon. Livré via
+MR GitLab !37, mergée dans `main`.
+
+## 2026-08-26 — chore/outils-externes-diagram-design (pas d'issue formelle)
+
+Ajoute une section "Outils externes recommandés (plugins, non vendorisés)"
+à `CLAUDE.md` (et son pendant dans `README.md`) : contrairement aux skills
+vendorisés (`interroge`/`cadre`/.../`illustre`, copiés dans
+`.claude/skills/`), certains outils tiers utiles au framework se
+distribuent comme plugins Claude Code via marketplace — mode de
+distribution incompatible avec le vendoring, donc jamais installés
+automatiquement par `/amorce-projet`. Documente `diagram-design`
+(`cathrynlavery/diagram-design`, MIT) : diagrammes techniques (architecture,
+ER, séquence, UML...) en HTML+SVG autonome, en complément — jamais en
+remplacement — de Mermaid (documents versionnés, diffable en MR) et
+`/illustre` (visuels pédagogiques Excalidraw). Livré via MR GitLab !38,
+mergée dans `main`.
+
+## 2026-09-08 — Issue #13 — branche `claude/taga-mobile-test-automation-p2gugz`
+
+Ajoute le skill `/eprouve` : formalise Maestro comme preuve factuelle de
+bon fonctionnement d'un parcours utilisateur au fil du développement (pas
+seulement en diagnostic a posteriori d'un bug rapporté), au même titre que
+les tests Jest/PHPUnit déjà couverts par la doctrine Tests. Distingue
+explicitement l'écriture d'un flow (possible en session Cloud) de son
+exécution réelle (nécessite Maestro CLI + device/émulateur, donc une
+session locale). Reporté dans `amorce-projet` (socle commun) et dans
+`CLAUDE.md.template` (doctrine Tests étendue). Branche imposée par la
+session Claude Code Cloud, hors convention `<type>/<numero>-<slug>` — le
+numéro d'issue est référencé via la description de la Merge Request
+plutôt que le nom de branche. Livré via MR GitLab !40, mergée dans `main`.
+
+## 2026-09-24 — Issue #16 — branche `claude/maestro-android-emulator-performance-vjxvcq`
+
+Documente `mobile-mcp` (`mobile-next/mobile-mcp`) dans `CLAUDE.md` >
+Outils externes recommandés : serveur MCP de pilotage live d'un
+émulateur/simulateur par agent, en complément — jamais en remplacement —
+de `/eprouve` (Maestro) pour le testing exploratoire (zone d'app non
+cartographiée, diagnostic sans reproduction connue). Tableau de décision
+`/eprouve` (régression scriptée, par défaut) vs `mobile-mcp` (exploration)
+vs conversion vers `/eprouve` dès qu'un chemin exploratoire se stabilise.
+Miroir README ajouté dans une seconde MR après un oubli initial (même
+pattern que `diagram-design`). Branche imposée par la session Claude Code
+Cloud, hors convention `<type>/<numero>-<slug>` — numéro d'issue référencé
+via la description des Merge Requests plutôt que le nom de branche
+(même situation que l'issue #13). Livré via MR GitLab !43 (doctrine) et
+!44 (miroir README), toutes deux mergées dans `main`.
+
