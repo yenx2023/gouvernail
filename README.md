@@ -276,6 +276,15 @@ scripts/aligne-gouvernail.sh outillage
 scripts/aligne-gouvernail.sh donnees
 ```
 
+**Audit automatique au démarrage.** `.claude/settings.json` (copié par
+`/amorce-projet`) déclenche un hook `SessionStart` qui lance `audit --court` :
+une seule ligne (« N optimisation(s) disponible(s) — lance /aligne ») quand il y
+a quelque chose à faire, **rien** sinon — donc aucun coût en tokens sur un
+projet à jour. Le hook ne se déclenche qu'au démarrage, jamais ne bloque la
+session (`|| true`) et n'accède jamais au réseau. `outillage` copie
+`settings.json` s'il est absent ; si le projet a déjà ses propres réglages,
+rien n'est fusionné automatiquement : le hook à ajouter est affiché.
+
 Le script ne committe ni ne pousse jamais : la livraison d'un alignement
 passe par `/livre` (branche + Merge Request).
 

@@ -169,6 +169,9 @@ divergent trop pour deviner.
    - `tests/archive-journal.test.sh`
    - `tests/aligne-gouvernail.test.sh`
    - `tests/modeles.test.sh`
+   - `.claude/settings.json` (hook `SessionStart` : audit d'alignement sur
+     Gouvernail, une ligne ou rien — voir README > Aligner un projet sur
+     Gouvernail)
    - `.env.example`
    - `docs/DOCTRINE.md` ← `references/doctrine-technique.md` (détail des
      principes techniques — SOLID, Tests, Documentation vivante, logging —
