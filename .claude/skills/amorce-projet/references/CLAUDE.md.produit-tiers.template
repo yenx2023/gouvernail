@@ -137,8 +137,9 @@ le lire avant toute tâche qui touche du code déjà personnalisé.
 ## Principes de conception (SOLID + DRY)
 
 Le code applicatif de ce projet suit les principes **SOLID** dès qu'une
-modélisation orientée objet ou modulaire est en jeu — voir le
-`CLAUDE.md.template` de Gouvernail pour le détail de chaque lettre. Ça ne
+modélisation orientée objet ou modulaire est en jeu — voir
+`docs/DOCTRINE.md` > Principes de conception pour le détail de chaque
+lettre. Ça ne
 justifie pas l'abstraction prématurée : trois lignes similaires valent
 mieux qu'une abstraction anticipée, en particulier dans du code personnalisé
 qui doit rester facile à repérer face à l'amont — une personnalisation trop
@@ -179,7 +180,7 @@ qu'aux frontières du système (entrée utilisateur, API externe).
 
 ## Stratégie de logging
 
-Voir le `CLAUDE.md.template` de Gouvernail pour le détail complet
+Voir `docs/DOCTRINE.md` > Stratégie de logging pour le détail complet
 (niveaux fidèles à la sévérité, catégorisation technique/audit, volumétrie
 maîtrisée, structuré, jamais de secret en clair, un événement un log,
 contexte exploitable, mécanisme natif avant dépendance externe) — principes

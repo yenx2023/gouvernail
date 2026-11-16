@@ -320,3 +320,17 @@ Renvoie à `scripts/mesure-contexte.sh` pour chiffrer l'effet. Le gain réel
 (≈ 22–38 k tokens de journal + ≈ 45 k de design sur les sessions UI de TAGA)
 se vérifiera au portage (#25). Livré via Merge Request GitLab, mergée dans
 `main`.
+
+## 2026-11-16 — Issue #22 — `chore/22-alleger-claude-md-template`
+
+Allège `CLAUDE.md.template` (profil conception) de 16,5 Ko à 10,6 Ko
+(≈ −1 600 tokens par tour) : le détail de SOLID, Tests, Documentation
+vivante et Stratégie de logging est déplacé, repris mot pour mot, dans
+`references/doctrine-technique.md`, que `/amorce-projet` copie en
+`docs/DOCTRINE.md` dans chaque projet (les deux profils) ; `CLAUDE.md` n'en
+garde que la règle courte et un pointeur. Corrige au passage les renvois du
+gabarit `produit-tiers` vers « le `CLAUDE.md.template` de Gouvernail »,
+inaccessibles depuis un projet. `/amorce-projet` copie aussi désormais
+`scripts/mesure-contexte.sh` et son test. 52 phrases d'origine vérifiées
+présentes dans la doctrine détaillée. Livré via Merge Request GitLab,
+mergée dans `main`.
