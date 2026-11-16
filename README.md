@@ -133,6 +133,12 @@ bash tests/mesure-contexte.test.sh
 bash tests/archive-journal.test.sh
 ```
 
+`scripts/aligne-gouvernail.sh` est couvert par `tests/aligne-gouvernail.test.sh` :
+
+```
+bash tests/aligne-gouvernail.test.sh
+```
+
 Le frontmatter des subagents et des skills (`model:`, `effort:`, `name`,
 garde-fous) est validé par `tests/modeles.test.sh` :
 
@@ -223,6 +229,24 @@ un résumé : `/livre` (mode merge) applique donc deux règles à chaque merge.
 scripts/archive-journal.sh                  # journal de ce dépôt, 15 entrées gardées
 scripts/archive-journal.sh --garder 10      # seuil personnalisé
 ```
+
+## Aligner un projet sur Gouvernail
+
+Un projet amorcé est une **copie** de l'outillage : rien ne le relie à
+Gouvernail ensuite. `.claude/gouvernail-version` (écrit par `/amorce-projet`)
+retient le commit de Gouvernail dont l'outillage a été copié ;
+`scripts/aligne-gouvernail.sh` s'en sert pour savoir ce qui a changé depuis.
+La source de Gouvernail se résout par `GOUVERNAIL_SOURCE` (défaut : le dépôt
+voisin `../gouvernail`), à défaut par un clone temporaire de
+`GOUVERNAIL_REPO_URL` (session Cloud).
+
+```
+scripts/aligne-gouvernail.sh marqueur lire      # version copiée dans ce projet
+scripts/aligne-gouvernail.sh marqueur ecrire    # l'enregistrer (projet existant, premier alignement)
+```
+
+Le script ne committe ni ne pousse jamais : la livraison d'un alignement
+passe par `/livre` (branche + Merge Request).
 
 ## Aller plus loin
 
