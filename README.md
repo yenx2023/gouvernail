@@ -245,6 +245,20 @@ scripts/aligne-gouvernail.sh marqueur lire      # version copiée dans ce projet
 scripts/aligne-gouvernail.sh marqueur ecrire    # l'enregistrer (projet existant, premier alignement)
 ```
 
+`scripts/aligne-gouvernail.sh audit` est un rapport **en lecture seule** : il ne
+modifie rien. Il signale l'outillage manquant ou périmé (une copie modifiée
+localement n'est jamais comptée comme périmée : elle est signalée à part),
+`docs/CONTEXT.md` au-delà de ≈ 6 Ko, un journal de plus de 15 entrées, un
+`DESIGN.md` monolithique, la règle de lecture de début de session absente de
+`CLAUDE.md`, le marqueur absent ou en retard. Code retour 1 s'il y a quelque
+chose à faire. `audit --court` n'écrit qu'une ligne (ou rien) et n'accède
+jamais au réseau.
+
+```
+scripts/aligne-gouvernail.sh audit
+scripts/aligne-gouvernail.sh audit --court
+```
+
 Le script ne committe ni ne pousse jamais : la livraison d'un alignement
 passe par `/livre` (branche + Merge Request).
 
