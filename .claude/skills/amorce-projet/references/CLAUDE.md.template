@@ -270,8 +270,17 @@ minimal : ce biais est à contrer explicitement.
   Maintenu via une étape du skill `/livre` (mode merge), pas un fichier à
   mettre à jour manuellement en dehors de ce flux.
 - `docs/JOURNAL.md` : journal chronologique des tâches livrées, une entrée par
-  clôture (date, numéro d'issue GitLab, branche, résumé). Toujours le lire en
-  début de session pour retrouver le contexte des sessions précédentes.
+  clôture (date, numéro d'issue GitLab, branche, résumé). **Ne pas le lire en
+  entier en début de session** (il grossit à chaque livraison) : consulter la
+  fin du fichier (`tail`) pour les dernières entrées, ou chercher par numéro
+  d'issue / mot-clé (`grep -n "Issue #<n>" docs/JOURNAL.md`) quand on a besoin
+  du contexte d'une tâche précise.
+- **Règle de lecture de début de session** : lire d'abord le résumé
+  (`docs/CONTEXT.md`), puis seulement ce que la tâche exige. Un document long
+  (journal, `docs/DESIGN.md` s'il existe) se lit par recherche ou par section
+  — pour une tâche d'interface, uniquement les sections du design utiles à
+  l'écran ou au composant visé — jamais en entier par défaut. Mesurer l'effet
+  avec `scripts/mesure-contexte.sh`.
 
 ## Ce que Claude ne doit jamais faire seul
 
