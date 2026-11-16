@@ -170,6 +170,27 @@ sont propres à Claude Code (claude.ai et l'API n'acceptent qu'un jeu réduit
 de champs). L'économie réelle dépend des modèles disponibles sur votre
 abonnement (`availableModels`) — mesurez avec `/cost`.
 
+### Lancer Claude Code avec un modèle donné (alias shell)
+
+Pour choisir le modèle dès le lancement plutôt que par `/model`, trois alias
+suffisent dans `~/.bashrc` ou `~/.zshrc` :
+
+```
+alias ccs='claude --model sonnet'
+alias cco='claude --model opus'
+alias cch='claude --model haiku'
+```
+
+Le dépôt tiers [`videvjs/claude-aliases`](https://github.com/videvjs/claude-aliases)
+propose les mêmes alias, mais **son script d'installation y ajoute
+`--dangerously-skip-permissions`**, qui désactive toutes les demandes de
+permission — incompatible avec la doctrine de Gouvernail (gates humains, voir
+`CLAUDE.md` > Ce que Claude ne doit jamais faire seul). À ne pas installer tel
+quel : copier les alias ci-dessus à la place, ou retirer ce flag après
+installation. Ce dépôt reste un outil externe non vendorisé, jamais installé
+par `/amorce-projet`. Ces alias ne changent le modèle qu'au lancement : le
+routage par tâche reste assuré par les skills et subagents ci-dessus.
+
 ## Mesurer le contexte chargé par session
 
 `scripts/mesure-contexte.sh [racine-du-depot]` affiche, pour un dépôt outillé

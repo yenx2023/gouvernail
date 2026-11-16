@@ -29,19 +29,6 @@ création du fichier vide à l'amorçage dans `amorce-projet` (symétrique à
 `docs/REGISTRE.md`/skill `/piege` avant cette remontée. Livré via MR
 GitLab !41, mergée dans `main`.
 
-## 2026-07-29 — Issue #9 — `fix/9-milestone-empty-parametre-invalide`
-
-Corrige `scripts/gitlab-api.sh` > `milestone_is_empty()` : interrogeait
-`GET /projects/:id/issues?milestone_id=<id>`, paramètre invalide côté API
-GitLab (HTTP 400 "milestone_id does not have a valid value"). L'endpoint
-attend `milestone=<titre>` — résout désormais le titre du milestone avant
-de filtrer les issues ouvertes. Bug découvert en conditions réelles le
-2026-07-29 sur `taga-backend` (clôture du milestone "Authentification &
-comptes"), vérifié corrigé sur un milestone vide et un milestone encore
-ouvert. Reporté dans les deux projets qui en ont une copie
-(`taga-backend`#58, `taga-mobile-app`#43). Livré via MR GitLab !33, mergée
-dans `main`.
-
 ## 2026-07-29 — Issue #10 — `chore/10-limite-verification-visuelle-cloud`
 
 Retour d'expérience `taga-mobile-app` : Claude Code Cloud (sandbox web
@@ -206,3 +193,14 @@ automatique) ; `/cloture` cherche aussi dans les archives ; `/amorce-projet`
 copie le script et son test ; gabarits, `CLAUDE.md` et README documentent la
 règle. Premier archivage appliqué au journal de Gouvernail dans cette même
 livraison. Livré via Merge Request GitLab, mergée dans `main`.
+
+## 2026-11-16 — Issue #24 — `chore/24-alias-modele-sans-skip-permissions`
+
+Documente dans le README (section « Choisir le modèle selon la tâche ») trois
+alias shell `ccs`/`cco`/`cch` (`claude --model sonnet|opus|haiku`) **sans**
+`--dangerously-skip-permissions`. Signale que l'installateur du dépôt tiers
+`videvjs/claude-aliases` ajoute ce flag, incompatible avec la doctrine de
+gates humains : outil externe non vendorisé, jamais installé par
+`/amorce-projet`. Les alias ne fixent le modèle qu'au lancement ; le routage
+par tâche reste assuré par les skills et subagents. Documentation seule, aucun
+test ajouté. Livré via Merge Request GitLab, mergée dans `main`.
