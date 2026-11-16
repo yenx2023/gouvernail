@@ -150,7 +150,7 @@ divergent trop pour deviner.
      `.claude/skills/investigue/`, `.claude/skills/illustre/`,
      `.claude/skills/design/`, `.claude/skills/eprouve/`,
      `.claude/skills/LICENSE-claude-mastery`. `/eprouve` (validation E2E
-     Maestro, voir `CLAUDE.md.template` > Tests) n'a d'usage réel que sur
+     Maestro, voir `CLAUDE.md.template` > Tests et `docs/DOCTRINE.md`) n'a d'usage réel que sur
      un projet à surface visuelle/interactive (mobile, frontend web) mais
      reste copié sans condition, comme `/design`/`/illustre` — il ne sera
      simplement jamais invoqué sur un projet qui n'en a pas l'usage.
@@ -159,8 +159,14 @@ divergent trop pour deviner.
    - **Si profil `produit-tiers`** : ajouter `.claude/skills/absorbe/`,
      `.claude/skills/registre/`, `.claude/skills/piege/`.
    - `scripts/gitlab-api.sh`
+   - `scripts/mesure-contexte.sh`
    - `tests/gitlab-api.test.sh`
+   - `tests/mesure-contexte.test.sh`
    - `.env.example`
+   - `docs/DOCTRINE.md` ← `references/doctrine-technique.md` (détail des
+     principes techniques — SOLID, Tests, Documentation vivante, logging —
+     lu à la demande ; le `CLAUDE.md` généré n'en garde que la règle courte
+     et y renvoie, quel que soit le profil)
    - `.gitignore`
    - **Jamais** `amorce-projet/` lui-même, quel que soit le profil.
 
